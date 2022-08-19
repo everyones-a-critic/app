@@ -11,7 +11,10 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles": [
+      "./jest/setup.js"
+    ]
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity": "^3.145.0",
