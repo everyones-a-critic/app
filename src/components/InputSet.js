@@ -1,45 +1,36 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { TouchableWithoutFeedback, View, TextInput, StyleSheet, Animated } from 'react-native';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { Pressable, View, TextInput, StyleSheet, Animated } from 'react-native';
+import uuid from 'react-native-uuid';
 
-import {selectInput} from "../actions";
-import InputError from "./inputError";
+import { FocusedElementContext } from "../context/focusedElement";
+import InputError from "./InputError";
 import { GRAY, RED } from "../settings/colors";
 
 
-const InputSet = ({label, onChange, options, selectedInput, selectInput, style, error}) => {
+const InputSet = ({label, options, style, error, onChange}) => {
+    const { focusedElement, setFocusedElement } = useContext(FocusedElementContext);
     const [fontSizeAnimation, setFontSizeAnimation] = useState(new Animated.Value(18));
     const [inputValue, setInputValue] = useState(null);
-    const [isFocused, setIsFocused] = useState(false);
     const [errorText, setErrorText] = useState(error);
+
     const wrapperElement = useRef(null);
     const labelElement = useRef(null);
     const inputElement = useRef(null);
-    const uid = crypto.randomUUID();
 
-    useEffect(() => {
-        if (error != null){
-            setErrorText(error)
-        }
-    }, [ error ])
-
-    const onWrapperPress = () => {
-        selectInput(inputElement.current);
-        shrinkLabel();
-    };
+    // generating a random id used to link the input's label to the input for accessibility users
+    const uid = uuid.v4();
 
     const animatedStyles = {
         fontSize: fontSizeAnimation
     }
 
     const shrinkLabel = () => {
+        inputElement.current.focus();
         Animated.timing(fontSizeAnimation, {
             toValue: 14,
             duration: 35,
             useNativeDriver: false
-        }).start(() => {
-            inputElement.current.focus();
-        });
+        }).start();
     };
 
     const growLabel = () => {
@@ -52,34 +43,40 @@ const InputSet = ({label, onChange, options, selectedInput, selectInput, style, 
         }
     }
 
+    useEffect(() => {
+        if (error != null){
+            setErrorText(error)
+        }
+    }, [ error ])
+
+    const onWrapperPress = () => {
+        shrinkLabel();
+    };
+
     const onInputChange = e => {
-        setInputValue(e.nativeEvent.text)
+        setInputValue(e.text)
         setErrorText(null);
         onChange(e);
     }
 
-    const setDisplayStyle = () => {
-        if (
-            (selectedInput !== null && inputElement.current === selectedInput)
-            || (inputValue !== null && inputValue !== "")
-        ) {
-            return { display: "flex" };
-        } else {
-            return { display: "none" };
-        }
+    const onInputBlur = () => {
+        setFocusedElement(null);
+        growLabel();
     }
 
-    const inputBlur = () => {
-        setIsFocused(false);
-        growLabel();
-        selectInput(null);
-    }
+    const isFocused = (
+        (focusedElement !== null && inputElement.current === focusedElement)
+        || (inputValue !== null && inputValue !== "")
+    )
 
     return (
-        <View style={{width: '100%', alignItems: 'center'}}>
-            <TouchableWithoutFeedback
+        <View style={{width: '100%' }}>
+            <Pressable
+                testID="wrapper"
+                style={{ width: "100%", alignItems: 'center' }}
                 accessible={true}
                 accessibilityHint={`Tap to select the ${label} input`}
+                accessibilityState={{expanded: isFocused }}
                 onPress={onWrapperPress}
             >
                 <View
@@ -102,22 +99,23 @@ const InputSet = ({label, onChange, options, selectedInput, selectInput, style, 
                         {label}
                     </Animated.Text>
                     <TextInput
-                        ref={inputElement}
-                        style={{...styles.input, ...setDisplayStyle()}}
-                        value={inputValue}
-                        {...options }
-                        onFocus={() => setIsFocused(true)}
-                        onChange={(e) => onInputChange(e)}
-                        onBlur={() => inputBlur()}
                         accessibilityLabel={`${label} Entry`}
                         accessibilityLabelledBy={uid}
+                        {...options }
+                        style={[styles.input, { display: isFocused ? 'flex' : 'none' }]}
+                        value={inputValue}
+                        ref={inputElement}
+                        onChangeText={(e) => onInputChange(e)}
+                        onFocus={() => setFocusedElement(inputElement.current) }
+                        onBlur={() => onInputBlur()}
+
                     />
                 </View>
-            </TouchableWithoutFeedback>
+            </Pressable>
             <InputError error={errorText} inputLabel={label} />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -148,12 +146,4 @@ const styles = StyleSheet.create({
     }
 });
 
-InputSet.defaultProps = {
-    required: false
-}
-
-const mapStateToProps = (state) => {
-  return { selectedInput: state.selectedInput };
-}
-
-export default connect(mapStateToProps, { selectInput })(InputSet);
+export default InputSet;

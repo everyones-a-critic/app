@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react-native';
 import { toHaveTextContent } from '@testing-library/jest-native';
 expect.extend({ toHaveTextContent });
 
-import InputError from "./inputError";
+import InputError from "./InputError";
 
 describe('InputError should not render when error is', () => {
     test('null', () => {
