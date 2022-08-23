@@ -39,14 +39,11 @@ describe('When input is blurred', () => {
 
     describe('if input is not empty', () => {
         test('the input label should not grow', () => {
-            const onChangeMock = jest.fn();
-            render(<InputSet onChange={onChangeMock} label="Sample" />);
+            render(<InputSet label="Sample" />);
             fireEvent.press(screen.getByText("Sample"))
             // input should be visible after we press the wrapper
             const input = screen.getByLabelText("Sample Entry");
             fireEvent.changeText(input, 'abc')
-            expect(onChangeMock).toHaveBeenCalledTimes(1)
-
             fireEvent(input, 'onBlur');
             jest.advanceTimersByTime(50)
             expect(screen.getByText("Sample")).toHaveStyle({fontSize: 14});
@@ -99,4 +96,22 @@ test('InputError should render error prop as text', () => {
     render(<InputSet error="This is a test" label="Sample" />);
 
     expect(screen.getByRole("alert")).toHaveTextContent("This is a test");
+});
+
+describe('when onInputText ',  () => {
+    test('is not passed, we should be able to change text without error', () => {
+        render(<InputSet label="Sample" />);
+        fireEvent.press(screen.getByText("Sample"))
+        const input = screen.getByLabelText("Sample Entry");
+        fireEvent.changeText(input, 'abc')
+    });
+
+    test('is passed, it should be called when text is changed', () => {
+        const onChangeMock = jest.fn();
+        render(<InputSet onChangeText={onChangeMock} label="Sample" />);
+        fireEvent.press(screen.getByText("Sample"))
+        const input = screen.getByLabelText("Sample Entry");
+        fireEvent.changeText(input, 'abc')
+        expect(onChangeMock).toHaveBeenCalledTimes(1)
+    });
 });

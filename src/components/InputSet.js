@@ -7,7 +7,7 @@ import InputError from "./InputError";
 import { GRAY, RED } from "../settings/colors";
 
 
-const InputSet = ({label, options, style, error, onChange}) => {
+const InputSet = ({label, options, style, error, onChangeText}) => {
     const { focusedElement, setFocusedElement } = useContext(FocusedElementContext);
     const [fontSizeAnimation, setFontSizeAnimation] = useState(new Animated.Value(18));
     const [inputValue, setInputValue] = useState(null);
@@ -56,7 +56,9 @@ const InputSet = ({label, options, style, error, onChange}) => {
     const onInputChange = e => {
         setInputValue(e.text)
         setErrorText(null);
-        onChange(e);
+        if (onChangeText !== undefined) {
+            onChangeText(e);
+        }
     }
 
     const onInputBlur = () => {
