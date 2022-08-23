@@ -2,6 +2,7 @@ import React, { createRef } from "react";
 import { View, Animated, StyleSheet } from 'react-native';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner'
+import {clearTimeout} from "@testing-library/react-native/build/helpers/timers";
 
 
 class Loader extends React.Component {
@@ -27,7 +28,7 @@ class Loader extends React.Component {
     });
 
     initiateSpinner = () => {
-        if (this.props.loading) {
+        if (this.props.loading && this.timer === undefined) {
             this.timer = setTimeout(() => {
                 this.ref.current.setNativeProps({ style: { display: 'flex' }});
                 this.rotateSpinner();
@@ -39,8 +40,15 @@ class Loader extends React.Component {
         this.initiateSpinner();
     }
 
-    componentDidUpdate = () => {
+    componentDidUpdate = (prevProps) => {
         this.initiateSpinner();
+        if (prevProps.loading && !this.props.loading) {
+            clearTimeout(this.timer);
+        }
+    }
+
+    componentWillUnmount = () => {
+        clearTimeout(this.timer);
     }
 
     renderSpinner = () => {
