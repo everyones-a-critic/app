@@ -53,11 +53,11 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
         shrinkLabel();
     };
 
-    const onInputChange = e => {
-        setInputValue(e.text)
+    const onInputChange = text => {
+        setInputValue(text)
         setErrorText(null);
         if (onChangeText !== undefined) {
-            onChangeText(e);
+            onChangeText(text);
         }
     }
 
@@ -72,7 +72,7 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
     )
 
     return (
-        <View style={{width: '100%' }}>
+        <View style={{width: '100%', alignItems: 'center' }}>
             <Pressable
                 testID="wrapper"
                 style={{ width: "100%", alignItems: 'center' }}
