@@ -7,10 +7,6 @@ import {
     StyleSheet, KeyboardAvoidingView, ScrollView, View, Pressable, Text, Image, Keyboard, Platform
 } from 'react-native';
 
-import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID, COGNITO_REGION } from 'react-native-dotenv';
-
-import InputSet from '../components/InputSet';
 import Loader from '../components/Loader';
 import InputError from "../components/InputError";
 import { YELLOW } from "../settings/colors";
@@ -31,6 +27,7 @@ class AccountManagementPage extends React.Component {
     }
 
     onSubmit = async e =>  {
+        Keyboard.dismiss();
         this.setState({ submitDisabled: true })
         this.setState({ webRequestInProgress: true })
         if (this.validate()) {

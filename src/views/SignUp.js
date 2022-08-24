@@ -3,18 +3,13 @@ import { setupURLPolyfill } from 'react-native-url-polyfill';
 setupURLPolyfill();
 
 import React from 'react';
-import {
-    StyleSheet, KeyboardAvoidingView, ScrollView, View, Pressable, Text, Image, Keyboard, Platform
-} from 'react-native';
 
 import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID, COGNITO_REGION } from 'react-native-dotenv';
 
 import AccountManagementPage from "../components/AccountManagementPage";
 import InputSet from '../components/InputSet';
-import Loader from '../components/Loader';
-import InputError from "../components/InputError";
-import { YELLOW } from "../settings/colors";
+
 
 class SignUp extends React.Component {
     state = {
@@ -22,13 +17,10 @@ class SignUp extends React.Component {
         password: null,
         passwordError: null,
         emailError: null,
-        submitDisabled: false,
-        webRequestInProgress: false,
         genericError: null
     };
 
     validate = () => {
-        Keyboard.dismiss();
         let isValid = true;
         if (this.state.email === null) {
             this.setState({emailError: 'Email is required'});
@@ -106,7 +98,6 @@ class SignUp extends React.Component {
 
                 />
                 <InputSet
-                    style={styles.input}
                     label="Password"
                     error={this.state.passwordError}
                     onChangeText={(text) => this.setState({password: text})}
@@ -121,54 +112,5 @@ class SignUp extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    flexbox: {
-        flex: 1,
-        alignItems: 'center',
-        width: '100%',
-    },
-    container: {
-        minHeight: "100%",
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        backgroundColor: YELLOW,
-        fontFamily: 'Helvetica Neue',
-    },
-    image: {
-        resizeMode: 'contain',
-        minHeight: 160,
-    },
-    button: {
-        alignItems: 'center',
-        backgroundColor: 'black',
-        padding: 15,
-        borderRadius: 5,
-        height: 50
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16,
-    },
-    link: {
-        fontWeight: "700",
-        fontSize: 16,
-        textDecorationLine: 'underline',
-        margin: 15
-    },
-    errorContainer: {
-        width: "90%",
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: '#F5C6CA',
-        backgroundColor: '#F8D7D9',
-        overflowWrap: 'break-word'
-    },
-    error: {
-        fontSize: 14,
-        color: '#721C23',
-    }
-});
 
 export default SignUp;
