@@ -80,7 +80,7 @@ class SignUp extends React.Component {
                 validate={() => this.validate()}
                 formError={this.state.genericError}
                 onSubmit={() => this.attemptSignUp()}
-                onSuccess={() => this.navigateToConfirmationPage()}
+                navigationDetails={{text: "Sign In", action: () => this.navigateToConfirmationPage()}}
                 submitButtonText="Sign Up"
                 formName="Sign Up"
             >

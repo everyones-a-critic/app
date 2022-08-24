@@ -4,26 +4,49 @@ setupURLPolyfill();
 
 import React from 'react';
 import {
-    StyleSheet, KeyboardAvoidingView, ScrollView, View, Pressable, Text, Image, Keyboard, Platform
+    StyleSheet, KeyboardAvoidingView, ScrollView, View, Pressable, Text, Image, Keyboard, Platform,
+    Dimensions
 } from 'react-native';
 
 import Loader from '../components/Loader';
 import InputError from "../components/InputError";
 import { YELLOW } from "../settings/colors";
 
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
+
+
 class AccountManagementPage extends React.Component {
     state = {
         submitDisabled: false,
         webRequestInProgress: false,
+        dimensions: { window, screen },
+        keyboardVisible: false
     };
+
+    onChange = ({ window, screen }) => {
+        this.setState({ dimensions: { window, screen } });
+    };
+
+    componentDidMount() {
+        this.dimensionsSubscription = Dimensions.addEventListener("change", this.onChange);
+        this.keyboardDidShowSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            this.setState({ keyboardVisible: true });
+        });
+
+        this.keyboardDidHideSubscription = Keyboard.addListener('keyboardDidHide',() => {
+            this.setState({ keyboardVisible: false });
+        });
+    }
+
+    componentWillUnmount() {
+        this.dimensionsSubscription?.remove();
+        this.keyboardDidShowSubscription?.remove()
+        this.keyboardDidHideSubscription?.remove()
+    }
 
     validate = () => {
         return this.props.validate();
-    }
-
-    postSubmitProcessing = () => {
-        this.setState({ submitDisabled: false });
-        this.setState({ webRequestInProgress: false });
     }
 
     onSubmit = async e =>  {
@@ -38,6 +61,26 @@ class AccountManagementPage extends React.Component {
         }
     }
 
+    postSubmitProcessing = () => {
+        this.setState({ submitDisabled: false });
+        this.setState({ webRequestInProgress: false });
+    }
+
+    renderNavigationLink = () => {
+        if (this.props.navigationDetails !== undefined) {
+            return (
+                <Pressable onPress={() => {
+                    this.props.navigationDetails.action()
+                }}>
+                    <Text style={styles.link}>{ this.props.navigationDetails.text }</Text>
+                </Pressable>
+
+            );
+        } else {
+            return null;
+        }
+    }
+
     render() {
         return (
             <Loader loading={ this.state.webRequestInProgress }>
@@ -45,9 +88,15 @@ class AccountManagementPage extends React.Component {
                     behavior={ Platform.OS === "ios" ? "padding" : "height" }
                     style={{ flex: 1 }}
                 >
-                    <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={ styles.container }>
+                    <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={[
+                        styles.container,
+                        { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - 15 }
+                    ]}>
                         <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />
-                        <View style={[styles.flexbox, { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}]}>
+                        <View style={[
+                            styles.flexbox,
+                            { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}
+                        ]}>
                             { this.props.children }
                             <InputError error={this.props.formError} inputLabel={`${this.props.formName} Form`} />
                         </View>
@@ -67,9 +116,7 @@ class AccountManagementPage extends React.Component {
                                     <Text style={styles.buttonText}>{this.props.submitButtonText}</Text>
                                 </View>
                             </Pressable>
-                            <Pressable onPress={ () => { this.props.onSuccess() }}>
-                                <Text style={styles.link}>Sign In</Text>
-                            </Pressable>
+                            { this.renderNavigationLink() }
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -85,12 +132,12 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     container: {
-        minHeight: "100%",
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-around',
         backgroundColor: YELLOW,
         fontFamily: 'Helvetica Neue',
+        paddingBottom: 35
     },
     image: {
         resizeMode: 'contain',
@@ -101,7 +148,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         padding: 15,
         borderRadius: 5,
-        height: 50
+        height: 50,
+        marginBottom: 15
     },
     buttonText: {
         color: 'white',
@@ -111,7 +159,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: 16,
         textDecorationLine: 'underline',
-        marginTop: 15,
         marginBottom: 30
     },
     errorContainer: {
