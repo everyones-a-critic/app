@@ -8,9 +8,11 @@ import {
     Dimensions
 } from 'react-native';
 
+import {resetErrors, signUp} from "../features/account/accountSlice";
 import Loader from '../components/Loader';
 import InputError from "../components/InputError";
 import { YELLOW } from "../settings/colors";
+import {connect} from "react-redux";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -46,6 +48,7 @@ class AccountManagementPage extends React.Component {
     }
 
     validate = () => {
+        this.props.resetErrors();
         return this.props.validate();
     }
 
@@ -90,7 +93,7 @@ class AccountManagementPage extends React.Component {
                 >
                     <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={[
                         styles.container,
-                        { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - 15 }
+                        { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - 10 }
                     ]}>
                         <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />
                         <View style={[
@@ -98,7 +101,7 @@ class AccountManagementPage extends React.Component {
                             { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}
                         ]}>
                             { this.props.children }
-                            <InputError error={this.props.formError} inputLabel={`${this.props.formName} Form`} />
+                            <InputError errors={this.props.formErrors} inputLabel={`${this.props.formName} Form`} />
                         </View>
                         <View style={[styles.flexbox, { flexBasis: 120, flexShrink: 4, flexGrow: 4 }]}>
                             <Pressable
@@ -175,4 +178,10 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AccountManagementPage;
+const mapStateToProps = state => {
+    return {
+        loading: state.account.status === 'loading'
+    };
+};
+
+export default connect(mapStateToProps, { resetErrors })(AccountManagementPage);

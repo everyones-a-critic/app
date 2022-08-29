@@ -9,9 +9,10 @@ const cognitoMock = mockClient(CognitoIdentityProviderClient);
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {FocusedElementContext} from "../context/focusedElement";
 const Stack = createNativeStackNavigator();
 
+import store from '../../src/app/store';
+import { Provider } from 'react-redux';
 
 jest.mock('@fortawesome/react-native-fontawesome', () => ({
     FontAwesomeIcon: ''
@@ -26,7 +27,7 @@ test('When password is invalid', async () => {
     err.name = "InvalidPasswordException";
     cognitoMock.on(SignUpCommand).rejects(err);
 
-    const screen = render(<SignUp />);
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
     const emailInput = screen.getByLabelText("Email Entry")
     fireEvent.changeText(emailInput, 'test@test.com')
     const passwordInput = screen.getByLabelText("Password Entry")
@@ -39,20 +40,20 @@ test('When password is invalid', async () => {
 });
 
 test('When password is empty', async () => {
-    const screen = render(<SignUp />);
-    fireEvent.press(screen.getByText("Sign Up"));
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
     const emailInput = screen.getByLabelText("Email Entry");
     fireEvent.changeText(emailInput, 'test@test.com');
+    fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent("Password is required")
     });
 });
 
 test('When email is empty', async () => {
-    const screen = render(<SignUp />);
-    fireEvent.press(screen.getByText("Sign Up"));
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent("Email is required")
     });
@@ -63,7 +64,7 @@ test('When email is already registered', async () => {
     err.name = "UsernameExistsException";
     cognitoMock.on(SignUpCommand).rejects(err);
 
-    const screen = render(<SignUp />);
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
     const emailInput = screen.getByLabelText("Email Entry")
     fireEvent.changeText(emailInput, 'test@test.com')
     const passwordInput = screen.getByLabelText("Password Entry")
@@ -80,7 +81,7 @@ test('When email is invalid', async () => {
     err.name = "InvalidParameterException";
     cognitoMock.on(SignUpCommand).rejects(err);
 
-    const screen = render(<SignUp />);
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
     const emailInput = screen.getByLabelText("Email Entry")
     fireEvent.changeText(emailInput, 'test')
     const passwordInput = screen.getByLabelText("Password Entry")
@@ -98,12 +99,14 @@ test('When sign up is successful, user is redirected to Confirm Page', async () 
     cognitoMock.on(SignUpCommand).resolves({});
 
     const screen = render(
-        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen name="Sign Up" component={SignUp} options={{ headerShown: false }} />
-                <Stack.Screen name="Confirm Account" component={ConfirmAccount} options={{ headerShown: false }} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <Provider store={store}>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Sign Up" component={SignUp} options={{ headerShown: false }} />
+                    <Stack.Screen name="Confirm Account" component={ConfirmAccount} options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
     );
     const emailInput = screen.getByLabelText("Email Entry")
     fireEvent.changeText(emailInput, 'test@test.com')
