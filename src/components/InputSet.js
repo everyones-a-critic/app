@@ -7,11 +7,11 @@ import InputError from "./InputError";
 import { GRAY, RED } from "../settings/colors";
 
 
-const InputSet = ({label, options, style, error, onChangeText}) => {
+const InputSet = ({label, options, style, errors, onChangeText}) => {
     const { focusedElement, setFocusedElement } = useContext(FocusedElementContext);
     const [fontSizeAnimation, setFontSizeAnimation] = useState(new Animated.Value(18));
     const [inputValue, setInputValue] = useState(null);
-    const [errorText, setErrorText] = useState(error);
+    const [errorList, setErrorList] = useState(errors);
 
     const wrapperElement = useRef(null);
     const labelElement = useRef(null);
@@ -44,10 +44,10 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
     }
 
     useEffect(() => {
-        if (error != null){
-            setErrorText(error)
+        if (errors != null){
+            setErrorList(errors)
         }
-    }, [ error ])
+    }, [ errors ])
 
     const onWrapperPress = () => {
         shrinkLabel();
@@ -55,7 +55,7 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
 
     const onInputChange = text => {
         setInputValue(text)
-        setErrorText(null);
+        setErrorList([]);
         if (onChangeText !== undefined) {
             onChangeText(text);
         }
@@ -71,6 +71,18 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
         || (inputValue !== null && inputValue !== "")
     )
 
+    const renderErrors = () => {
+        const errorComponents = errorList.map((error, index) => {
+	        return <InputError key={`${label}-${index}`} error={error} inputLabel={label} />
+        });
+
+        return (
+            <React.Fragment>
+                { errorComponents }
+            </React.Fragment>
+        )
+    }
+
     return (
         <View style={{width: '100%', alignItems: 'center' }}>
             <Pressable
@@ -85,7 +97,7 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
                     style={[
                         style,
                         styles.wrapper,
-                        { borderColor: isFocused ? 'black' : errorText ? RED : GRAY }
+                        { borderColor: isFocused ? 'black' : errorList.length > 0 ? RED : GRAY }
                     ]}
                     ref={wrapperElement}
                 >
@@ -93,7 +105,7 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
                         style={[
                             styles.label,
                             animatedStyles,
-                            { color: isFocused ? 'black' : errorText ? RED : GRAY }
+                            { color: isFocused ? 'black' : errorList.length > 0 ? RED : GRAY }
                         ]}
                         ref={labelElement}
                         nativeID={uid}
@@ -114,7 +126,7 @@ const InputSet = ({label, options, style, error, onChangeText}) => {
                     />
                 </View>
             </Pressable>
-            <InputError error={errorText} inputLabel={label} />
+            { renderErrors() }
         </View>
     );
 };
@@ -147,5 +159,10 @@ const styles = StyleSheet.create({
         marginRight: 5,
     }
 });
+
+InputSet.defaultProps = {
+	errors: []
+}
+
 
 export default InputSet;

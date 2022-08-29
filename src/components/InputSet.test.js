@@ -55,20 +55,8 @@ describe('When input is blurred', () => {
 });
 
 describe('InputError should not render when error is', () => {
-    test('null', () => {
-        render(<InputSet error={null} label="Sample" />);
-        let notFound = false;
-        try {
-            screen.getByRole("alert");
-        } catch(e) {
-            notFound = true
-        }
-
-        expect(notFound).toBeTruthy()
-    });
-
-    test('undefined', () => {
-        render(<InputSet error={undefined} label="Sample" />);
+    test('not provided', () => {
+        render(<InputSet label="Sample" />);
         let notFound = false;
         try {
             screen.getByRole("alert");
@@ -80,7 +68,7 @@ describe('InputError should not render when error is', () => {
     });
 
     test('an empty string', () => {
-        render(<InputSet error="" label="Sample" />);
+        render(<InputSet errors={[""]} label="Sample" />);
         let notFound = false;
         try {
             screen.getByRole("alert");
@@ -93,9 +81,17 @@ describe('InputError should not render when error is', () => {
 });
 
 test('InputError should render error prop as text', () => {
-    render(<InputSet error="This is a test" label="Sample" />);
+    render(<InputSet errors={["This is a test"]} label="Sample" />);
 
     expect(screen.getByRole("alert")).toHaveTextContent("This is a test");
+});
+
+test('InputError should render multiple errors as text', () => {
+    render(<InputSet errors={["This is a test", "This is also a test"]} label="Sample" />);
+    const errorElements = screen.getAllByRole("alert");
+    expect(errorElements).toHaveLength(2);
+    expect(errorElements[0]).toHaveTextContent("This is a test");
+    expect(errorElements[1]).toHaveTextContent("This is also a test");
 });
 
 describe('when onInputText ',  () => {
