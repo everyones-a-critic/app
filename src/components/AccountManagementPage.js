@@ -84,6 +84,24 @@ class AccountManagementPage extends React.Component {
         }
     }
 
+    renderFormErrors = () => {
+        const errorComponents = this.props.formErrors.map((error, index) => {
+	        return (
+                <InputError
+                    key={`${this.props.formName}-${index}`}
+                    error={error}
+                    inputLabel={`${this.props.formName} Form`}
+                />
+            );
+        });
+
+        return (
+            <React.Fragment>
+                { errorComponents }
+            </React.Fragment>
+        )
+    }
+
     render() {
         return (
             <Loader loading={ this.state.webRequestInProgress }>
@@ -101,7 +119,7 @@ class AccountManagementPage extends React.Component {
                             { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}
                         ]}>
                             { this.props.children }
-                            <InputError errors={this.props.formErrors} inputLabel={`${this.props.formName} Form`} />
+                            { this.renderFormErrors() }
                         </View>
                         <View style={[styles.flexbox, { flexBasis: 120, flexShrink: 4, flexGrow: 4 }]}>
                             <Pressable
