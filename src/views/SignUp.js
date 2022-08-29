@@ -8,6 +8,7 @@ import { signUp } from "../features/account/accountSlice";
 
 import AccountManagementPage from "../components/AccountManagementPage";
 import InputSet from '../components/InputSet';
+import { concatErrors } from "../../utils";
 
 
 class SignUp extends React.Component {
@@ -37,19 +38,6 @@ class SignUp extends React.Component {
         // TODO : Add Sign In Navigation
     }
 
-    concatErrors(array, errorToAdd) {
-        let errors = [];
-        if (array && array.length > 0) {
-             errors = array;
-        }
-
-        if (errorToAdd) {
-            errors.push(errorToAdd);
-        }
-
-        return errors;
-    }
-
     componentDidUpdate(prevProps){
         if(prevProps.signUpStatus === 'loading' && this.props.signUpStatus === 'succeeded'){
             this.props.navigation.navigate('Confirm Account', { email: this.state.email });
@@ -71,7 +59,7 @@ class SignUp extends React.Component {
                     onChangeText={(text) => {
                         this.setState({email: text})
                     }}
-                    errors={ this.concatErrors(this.props.errors.fields.email, this.state.customEmailError) }
+                    errors={ concatErrors(this.props.errors.fields.email, this.state.customEmailError) }
                     options={{
                         keyboardType: "email-address",
                         textContentType: "emailAddress",
@@ -81,7 +69,7 @@ class SignUp extends React.Component {
                 />
                 <InputSet
                     label="Password"
-                    errors={ this.concatErrors(this.props.errors.fields.password, this.state.customPasswordError) }
+                    errors={ concatErrors(this.props.errors.fields.password, this.state.customPasswordError) }
                     onChangeText={(text) => this.setState({password: text})}
                     options={{
                         secureTextEntry: true,
