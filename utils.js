@@ -1,7 +1,7 @@
 export const concatErrors = (array, errorToAdd) => {
     let errors = [];
     if (array && array.length > 0) {
-         errors = array;
+         errors = [...array]
     }
 
     if (errorToAdd) {
