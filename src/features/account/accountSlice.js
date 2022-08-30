@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import {COGNITO_CLIENT_ID, COGNITO_REGION, COGNITO_USER_POOL_ID} from "react-native-dotenv";
-import {CognitoIdentityProviderClient, SignUpCommand, SignUpResponse } from "@aws-sdk/client-cognito-identity-provider";
+import {CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 
 
 export const signUp = createAsyncThunk('account/signUp', async formData => {
@@ -20,6 +20,27 @@ export const signUp = createAsyncThunk('account/signUp', async formData => {
     });
 
     const command = new SignUpCommand(input);
+    const response = await client.send(command);
+
+    return {
+        email: formData.email,
+        userStatus: response.UserConfirmed
+    };
+});
+
+export const confirm = createAsyncThunk('account/confirm', async formData => {
+    const input = {
+        ClientId: COGNITO_CLIENT_ID,
+        UserPoolId: COGNITO_USER_POOL_ID,
+        Username: formData.email,
+        ConfirmationCode: formData.confirmationCode,
+    };
+
+    const client = new CognitoIdentityProviderClient({
+        region: COGNITO_REGION,
+    });
+
+    const command = new ConfirmSignUpCommand(input);
     const response = await client.send(command);
 
     return {
@@ -91,6 +112,33 @@ export const accountSlice = createSlice({
                                 action.error.message
                             ];
                         }
+                        break;
+                    default:
+                        state.errors.form = [
+                            action.error.message
+                        ];
+                }
+            })
+            .addCase(confirm.pending, (state, action) => {
+                state.status = 'loading';
+                state.errors = {
+                    fields: {},
+                    form: []
+                }
+            })
+            .addCase(confirm.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.email = action.payload.email;
+                state.userStatus = action.payload.userStatus;
+            })
+            .addCase(confirm.rejected, (state, action) => {
+                state.status = 'failed';
+                switch (action.error.name) {
+                    case 'ExpiredCodeException':
+                        state.errors.fields.confirmationCode = [
+                            "The code provided is invalid or has expired. Please login again and a new code will be " +
+                            "sent to your email."
+                        ]
                         break;
                     default:
                         state.errors.form = [
