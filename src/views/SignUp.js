@@ -35,11 +35,11 @@ class SignUp extends React.Component {
     }
 
     navigateToSignInPage = () => {
-        // TODO : Add Sign In Navigation
+        this.props.navigation.navigate('Sign In');
     }
 
     componentDidUpdate(prevProps){
-        if(prevProps.signUpStatus === 'loading' && this.props.signUpStatus === 'succeeded'){
+        if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded'){
             this.props.navigation.navigate('Confirm Account', { email: this.state.email });
         }
     }
@@ -86,7 +86,7 @@ class SignUp extends React.Component {
 const mapStateToProps = state => {
     return {
         errors: state.account.errors,
-        signUpStatus: state.account.status
+        requestStatus: state.account.requestStatus
     };
 };
 

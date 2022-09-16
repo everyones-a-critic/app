@@ -1,6 +1,7 @@
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 import SignUp from './SignUp'
+import SignIn from './SignIn'
 import ConfirmAccount from "./ConfirmAccount";
 
 import { mockClient } from 'aws-sdk-client-mock';
@@ -94,8 +95,6 @@ test('When email is invalid', async () => {
 });
 
 test('When sign up is successful, user is redirected to Confirm Page', async () => {
-    const err = new Error("Invalid email address format.");
-    err.name = "InvalidParameterException";
     cognitoMock.on(SignUpCommand).resolves({});
 
     const screen = render(
@@ -116,5 +115,24 @@ test('When sign up is successful, user is redirected to Confirm Page', async () 
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
         expect(screen.getByText("A confirmation code was sent to the email address you provided. Enter this code below to confirm your account.")).toBeTruthy()
+    });
+});
+
+test('When sign in link is clicked, user is redirected to Sign In page', async () => {
+    const screen = render(
+        <Provider store={store}>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Sign Up" component={SignUp} options={{ headerShown: false }} />
+                    <Stack.Screen name="Sign In" component={SignIn} options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
+    const link = screen.getByText("Sign In")
+    fireEvent(link, 'press');
+
+    await waitFor(() => {
+        expect(screen.getByAccessibilityHint("Navigate to Sign Up page")).toBeTruthy();
     });
 });

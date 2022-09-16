@@ -72,9 +72,11 @@ class AccountManagementPage extends React.Component {
     renderNavigationLink = () => {
         if (this.props.navigationDetails !== undefined) {
             return (
-                <Pressable onPress={() => {
-                    this.props.navigationDetails.action()
-                }}>
+                <Pressable
+                    onPress={() => this.props.navigationDetails.action()}
+                    accessibilityRole='link'
+                    accessibilityHint={`Navigate to ${this.props.navigationDetails.text} page`}
+                >
                     <Text style={styles.link}>{ this.props.navigationDetails.text }</Text>
                 </Pressable>
 
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
-        loading: state.account.status === 'loading'
+        loading: state.account.requestStatus === 'loading'
     };
 };
 
