@@ -11,8 +11,7 @@ import { setItemAsync } from 'expo-secure-store';
 
 
 export const signUp = createAsyncThunk('account/signUp', async formData => {
-    // const email = formData.email.trim();
-    const email = "24.daniel.long@gmail.com";
+    const email = formData.email.trim();
     const input = {
         ClientId: COGNITO_CLIENT_ID,
         UserPoolId: COGNITO_USER_POOL_ID,
