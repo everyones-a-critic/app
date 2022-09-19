@@ -1,8 +1,7 @@
-import React, { createRef } from "react";
+import React from "react";
 import { View, Animated, StyleSheet } from 'react-native';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons/faSpinner'
-import {clearTimeout} from "@testing-library/react-native/build/helpers/timers";
 
 
 class Loader extends React.Component {
