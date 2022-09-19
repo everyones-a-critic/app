@@ -3,13 +3,13 @@ import { setupURLPolyfill } from 'react-native-url-polyfill';
 setupURLPolyfill();
 
 import React from "react";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import { Text, StyleSheet } from "react-native";
 
 import AccountManagementPage from "../components/AccountManagementPage";
 import InputSet from "../components/InputSet";
-import {confirm} from "../features/account/accountSlice";
-import {concatErrors} from "../../utils";
+import { confirm } from "../features/account/accountSlice";
+import { concatErrors } from "../../utils";
 
 
 class ConfirmAccount extends React.Component {
@@ -20,9 +20,9 @@ class ConfirmAccount extends React.Component {
 
     validate = () => {
         let isValid = true;
-        this.setState({confirmationCodeError: null });
+        this.setState({ confirmationCodeError: null });
         if (this.state.confirmationCode === null) {
-            this.setState({confirmationCodeError: 'Confirmation Code is required'});
+            this.setState({ confirmationCodeError: 'Confirmation Code is required' });
             isValid = false;
         }
 
@@ -30,19 +30,37 @@ class ConfirmAccount extends React.Component {
     }
 
     componentDidUpdate(prevProps){
-        if(prevProps.signUpStatus === 'loading' && this.props.signUpStatus === 'succeeded'){
-            // navigate to community enrollment page
+        if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded'){
+            this.props.navigation.navigate(
+                'Sign In',
+                {
+                    customMessage:  "Your email has been verified. Welcome to Everyone's a Critic! Please sign in to " +
+                                    "get started."
+                }
+            );
         }
+    }
+
+    tryConfirmation = () => {
+        return this.props.confirm({
+            email: this.props.route.params.email,
+            confirmationCode: this.state.confirmationCode
+        });
+    }
+
+    navigateToSignInPage = () => {
+        this.props.navigation.navigate('Sign In', { email: this.props.route.params.email });
     }
 
     render() {
         return (
             <AccountManagementPage
-                validate={() => this.validate()}
-                formErrors={this.props.errors.form}
-                onSubmit={() => this.props.confirm({email: "24.daniel.long@gmail.com", confirmationCode: this.state.confirmationCode})}
+                validate={ () => this.validate() }
+                formErrors={ this.props.errors.form }
+                onSubmit={ () => this.tryConfirmation() }
                 submitButtonText="Confirm Account"
                 formName="Confirm Account"
+                navigationDetails={{ text: "Back", action: () => this.navigateToSignInPage() }}
             >
                 <Text style={[ styles.header, styles.text ]}>Check your Email</Text>
                 <Text style={[ styles.message, styles.text ]}>
@@ -88,6 +106,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => {
     return {
         errors: state.account.errors,
+        requestStatus: state.account.requestStatus
     };
 };
 

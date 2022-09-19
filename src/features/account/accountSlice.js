@@ -84,11 +84,6 @@ export const confirm = createAsyncThunk('account/confirm', async formData => {
     return { email: formData.email };
 });
 
-//TODO - When token has expired, will return a 401 response:
-// {
-//     "message": "The incoming token has expired"
-// }
-
 export const signIn = createAsyncThunk('account/signIn', async formData => {
     const email = formData.email.trim()
     const input = {

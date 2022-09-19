@@ -1,6 +1,7 @@
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 import ConfirmAccount from "./ConfirmAccount";
+import SignIn from "./SignIn";
 
 import { mockClient } from 'aws-sdk-client-mock';
 import { CognitoIdentityProviderClient, ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
@@ -26,44 +27,54 @@ test('When confirmation code is invalid', async () => {
     err.name = "ExpiredCodeException";
     cognitoMock.on(ConfirmSignUpCommand).rejects(err);
 
-    const screen = render(<Provider store={store}><ConfirmAccount /></Provider>);
+    const screen = render(
+        <Provider store={ store }>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Confirm Account" initialParams={{ email: 'test@test.com' }} component={ ConfirmAccount } options={{ headerShown: false }} />
+                    <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
     const ccInput = screen.getByLabelText("Confirmation Code Entry")
     fireEvent.changeText(ccInput, '1234')
 
-    fireEvent.press(screen.getByText("Confirm Account"));
-    await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent(
-            "The code provided is invalid or has expired. Please login again and a new code will be sent to " +
-            "your email."
-        )
-    });
+    await waitFor(() => fireEvent.press(screen.getByText("Confirm Account")));
+    expect(screen.getByRole("alert")).toHaveTextContent(
+        "The code provided is invalid or has expired. Please login again and a new code will be sent to " +
+        "your email."
+    )
 });
 
 test('When confirmation code is empty', async () => {
-    const screen = render(<Provider store={store}><ConfirmAccount /></Provider>);
+    const screen = render(<Provider store={ store }><ConfirmAccount /></Provider>);
     fireEvent.press(screen.getByText("Confirm Account"));
     await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent("Confirmation Code is required")
     });
 });
 
-// test('When confirmation is successful, user is redirected to enrollment page', async () => {
-//     cognitoMock.on(SignUpCommand).resolves({});
-//
-//     const screen = render(
-//         <Provider store={store}>
-//             <NavigationContainer>
-//                 <Stack.Navigator>
-//                     <Stack.Screen name="Confirm Account" component={ConfirmAccount} options={{ headerShown: false }} />
-//                 </Stack.Navigator>
-//             </NavigationContainer>
-//         </Provider>
-//     );
-//
-//     const ccInput = screen.getByLabelText("Confirmation Code Entry")
-//     fireEvent.changeText(ccInput, '1234')
-//     fireEvent.press(screen.getByText("Confirm Account"));
-//     await waitFor(() => {
-//         expect(screen.getByText("")).toBeTruthy()
-//     });
-// });
+test('When confirmation is successful, user is redirected to Sign In page', async () => {
+    cognitoMock.on(ConfirmSignUpCommand).resolves({});
+
+    const screen = render(
+        <Provider store={ store }>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Confirm Account" initialParams={{ email: 'test@test.com' }} component={ ConfirmAccount } options={{ headerShown: false }} />
+                    <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
+
+    const ccInput = screen.getByLabelText("Confirmation Code Entry")
+    fireEvent.changeText(ccInput, '1234')
+    await waitFor(() => {
+        fireEvent.press(screen.getByText("Confirm Account"));
+    });
+    expect(screen.getByText(
+        "Your email has been verified. Welcome to Everyone's a Critic! Please sign in to get started."
+    )).toBeTruthy();
+});
