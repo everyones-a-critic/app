@@ -9,6 +9,8 @@ import { Provider } from 'react-redux';
 import SignUp from './src/views/SignUp';
 import SignIn from "./src/views/SignIn";
 import ConfirmAccount from "./src/views/ConfirmAccount";
+import CommunityEnrollment from "./src/views/CommunityEnrollment";
+
 import { FocusedElementContext } from "./src/context/focusedElement";
 
 
@@ -20,9 +22,18 @@ const App = () => {
             <NavigationContainer>
                 <FocusedElementContext.Provider value={{ focusedElement, setFocusedElement }}>
                     <Stack.Navigator>
-                        <Stack.Screen name="Sign Up" component={SignUp} options={{ headerShown: false }} />
-                        <Stack.Screen name="Sign In" component={SignIn} options={{ headerShown: false }} />
-                        <Stack.Screen name="Confirm Account" component={ConfirmAccount} options={{ headerShown: false }} />
+                        <Stack.Screen name="Sign Up"
+                                      component={ SignUp }
+                                      options={{ headerShown: false }} />
+                        <Stack.Screen name="Sign In"
+                                      component={ SignIn }
+                                      options={{ headerShown: false }} />
+                        <Stack.Screen name="Confirm Account"
+                                      component={ ConfirmAccount }
+                                      options={{ headerShown: false }} />
+                        <Stack.Screen name="Community Enrollment"
+                                      component={ CommunityEnrollment }
+                                      options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </FocusedElementContext.Provider>
             </NavigationContainer>
