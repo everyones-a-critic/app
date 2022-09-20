@@ -107,6 +107,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         lineHeight: 24,
         paddingBottom: 15,
+        paddingLeft: 10,
+        paddingRight: 10,
         textAlign: "center",
     }
 })
