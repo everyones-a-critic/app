@@ -61,6 +61,7 @@ class ConfirmAccount extends React.Component {
                 submitButtonText="Confirm Account"
                 formName="Confirm Account"
                 navigationDetails={{ text: "Back", action: () => this.navigateToSignInPage() }}
+                navigation={ this.props.navigation }
             >
                 <Text style={[ styles.header, styles.text ]}>Check your Email</Text>
                 <Text style={[ styles.message, styles.text ]}>

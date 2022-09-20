@@ -69,6 +69,7 @@ class SignIn extends React.Component {
                 navigationDetails={{text: "Sign Up", action: () => this.navigateToSignUpPage()}}
                 submitButtonText="Sign In"
                 formName="Sign In"
+                navigation={ this.props.navigation }
             >
                 { this.renderCustomMessage() }
                 <InputSet
@@ -115,7 +116,6 @@ const mapStateToProps = state => {
         errors: state.account.errors,
         requestStatus: state.account.requestStatus,
         confirmed: state.account.confirmed,
-        identityToken: state.account.identityToken,
     };
 };
 

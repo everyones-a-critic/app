@@ -27,6 +27,7 @@ class AccountManagementPage extends React.Component {
     };
 
     onChange = ({ window, screen }) => {
+        console.log("onChange called")
         this.setState({ dimensions: { window, screen } });
     };
 
@@ -41,10 +42,19 @@ class AccountManagementPage extends React.Component {
         });
     }
 
+    componentDidMount =() => {
+        if (this.props.navigation !== undefined) {
+            this.props.navigation.addListener('blur', () => {
+                this.postSubmitProcessing();
+            });
+        }
+    }
+
     componentWillUnmount() {
         this.dimensionsSubscription?.remove();
         this.keyboardDidShowSubscription?.remove()
         this.keyboardDidHideSubscription?.remove()
+        this.postSubmitProcessing();
     }
 
     validate = () => {

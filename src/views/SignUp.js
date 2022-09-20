@@ -53,6 +53,7 @@ class SignUp extends React.Component {
                 navigationDetails={{text: "Sign In", action: () => this.navigateToSignInPage()}}
                 submitButtonText="Sign Up"
                 formName="Sign Up"
+                navigation={ this.props.navigation }
             >
                 <InputSet
                     label="Email"
