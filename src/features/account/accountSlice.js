@@ -165,8 +165,8 @@ export const sendConfirmationCode = createAsyncThunk('account/sendConfirmationCo
 });
 
 export const signOut = createAsyncThunk('account/signOut', async () => {
-    await setItemAsync("IdentityToken", null);
-    await setItemAsync("RefreshToken", null);
+    await deleteItemAsync("IdentityToken");
+    await deleteItemAsync("RefreshToken");
 
     return {
         loggedIn: false,
