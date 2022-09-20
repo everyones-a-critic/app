@@ -23,13 +23,13 @@ api.interceptors.request.use(async config => {
 });
 
 api.interceptors.response.use(response => response, async error => {
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
         const input = {
             ClientId: COGNITO_CLIENT_ID,
             UserPoolId: COGNITO_USER_POOL_ID,
             AuthFlow: "REFRESH_TOKEN_AUTH",
             AuthParameters: {
-                REFRESH_TOKEN: await getItemAsync('RefreshToken'),
+                REFRESH_TOKEN: await getItemAsync('RefreshToken') || "_",
             }
         };
 
@@ -69,13 +69,17 @@ api.interceptors.response.use(response => response, async error => {
                 delete error.config.headers.Authorization;
                 return await api.request(error.config);
             } else {
-                return error;
+                return Promise.reject(error);
             }
         } catch (e) {
-            return error;
+            if (e?.name === "NotAuthorizedException") {
+                return Promise.reject(error);
+            } else {
+                throw e;
+            }
         }
     } else {
-        return error;
+        return Promise.reject(error);
     }
 });
 
