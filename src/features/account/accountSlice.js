@@ -122,12 +122,12 @@ export const signIn = createAsyncThunk('account/signIn', async formData => {
     //     "Session": undefined,
     // }
 
+    await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
     await setItemAsync("RefreshToken", response.AuthenticationResult.RefreshToken);
 
     return {
         email: formData.email,
-        identityToken: response.AuthenticationResult.IdToken,
-        tokenType: response.AuthenticationResult.TokenType
+        loggedIn: true,
     };
 });
 
@@ -164,12 +164,22 @@ export const sendConfirmationCode = createAsyncThunk('account/sendConfirmationCo
     // };
 });
 
+export const signOut = createAsyncThunk('account/signOut', async () => {
+    await setItemAsync("IdentityToken", null);
+    await setItemAsync("RefreshToken", null);
+
+    return {
+        loggedIn: false,
+    };
+});
+
 export const accountSlice = createSlice({
     name: 'account',
     initialState: {
         email: null,
         confirmed: false,
         requestStatus: 'idle',
+        loggedIn: false,
         errors: {
             fields: {},
             form: []
@@ -272,8 +282,7 @@ export const accountSlice = createSlice({
                 state.requestStatus = 'succeeded';
                 state.confirmed = true;
                 state.email = action.payload.email;
-                state.identityToken = action.payload.identityToken;
-                state.tokenType = action.payload.tokenType;
+                state.loggedIn = action.payload.loggedIn;
             })
             .addCase(signIn.rejected, (state, action) => {
                 state.requestStatus = 'failed';
@@ -293,7 +302,16 @@ export const accountSlice = createSlice({
                             action.error.message
                         ];
                 }
-            });
+            })
+            .addCase(signOut.pending, (state, action) => {
+                state.requestStatus = 'loading';
+            })
+            .addCase(signOut.fulfilled, (state, action) => {
+                state.requestStatus = 'succeeded';
+                state.confirmed = true;
+                state.email = action.payload.email;
+                state.loggedIn = action.payload.loggedIn;
+            })
     }
 });
 

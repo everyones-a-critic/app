@@ -96,7 +96,7 @@ describe("When sign in is successful, ", () => {
     test('if confirmed, then refresh token should be saved and user is redirected to Community Enrollment page', async () => {
         cognitoMock.on(InitiateAuthCommand).resolves({
             AuthenticationResult: {
-                AccessToken: "Test AccessToken",
+                IdToken: "Test IdToken",
                 RefreshToken: "Test RefreshToken",
                 TokenType: "Bearer"
             }
@@ -122,6 +122,7 @@ describe("When sign in is successful, ", () => {
             fireEvent.press(screen.getByText("Sign In"))
         });
         expect(setItemAsync).toHaveBeenCalledWith('RefreshToken', 'Test RefreshToken');
+        expect(setItemAsync).toHaveBeenCalledWith('IdentityToken', 'Test IdToken');
         expect(screen.getByText("Communities")).toBeTruthy();
     });
 
