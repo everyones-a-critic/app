@@ -37,8 +37,9 @@ api.interceptors.response.use(response => response, async error => {
             region: COGNITO_REGION,
         });
         const command = new InitiateAuthCommand(input);
+        let response;
         try {
-            const response = await client.send(command);
+            response = await client.send(command);
 
             // Object {
             //   "$metadata": Object {
@@ -61,25 +62,25 @@ api.interceptors.response.use(response => response, async error => {
             //   "ChallengeParameters": Object {},
             //   "Session": undefined,
             // }
-
-            await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
-
-            if (error.config.headers.retries === 0) {
-                error.config.headers.retries = 1;
-                delete error.config.headers.Authorization;
-                return await api.request(error.config);
-            } else {
-                return Promise.reject(error);
-            }
         } catch (e) {
             if (e?.name === "NotAuthorizedException") {
-                return Promise.reject(error);
+                return error;
             } else {
                 throw e;
             }
         }
+
+        await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
+
+        if (error.config.headers.retries === 0) {
+            error.config.headers.retries = 1;
+            delete error.config.headers.Authorization;
+            return await api.request(error.config);
+        } else {
+            return error;
+        }
     } else {
-        return Promise.reject(error);
+        return error;
     }
 });
 

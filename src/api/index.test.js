@@ -1,32 +1,6 @@
 import api from "./index";
-
-var mockFunction;
-jest.mock('axios', () => {
-    const axios = jest.requireActual('axios');
-    mockFunction = jest.fn();
-    return {
-        create: jest.fn(() => {
-            return {
-                ...axios,
-                request: mockFunction
-            }
-        })
-    };
-});
-
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
-
+import axios from "axios";
 import { setItemAsync } from 'expo-secure-store';
-jest.mock('expo-secure-store', () => {
-    return {
-        __esModule: true,
-        getItemAsync: jest.fn(() => Promise.resolve("SomeToken")),
-        setItemAsync: jest.fn(() => Promise.resolve())
-    }
-});
-
 import { mockClient } from 'aws-sdk-client-mock';
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
@@ -55,7 +29,7 @@ test("When a 401 response is received the token is refreshed", async () => {
         }
     });
 
-    mockFunction.mockResolvedValueOnce({data: 'test'});
+    axios.request.mockResolvedValueOnce({data: 'test'});
 
     const error = {
       config: {
@@ -73,7 +47,7 @@ test("When a 401 response is received the token is refreshed", async () => {
     }
     const response = await api.interceptors.response.handlers[0].rejected(error);
     expect(setItemAsync).toHaveBeenCalledWith("IdentityToken", "Test AccessToken");
-    expect(mockFunction).toHaveBeenCalledWith({
+    expect(axios.request).toHaveBeenCalledWith({
         "baseURL": "https://www.example.com",
         "headers": {
             "retries": 1
@@ -108,7 +82,7 @@ test("When two 401 responses in a row are received, the 401 is returned", async 
       }
     }
 
-    mockFunction.mockRejectedValueOnce(error);
+    axios.request.mockResolvedValueOnce(error);
 
     const request_error = await api.interceptors.response.handlers[0].rejected(error);
     expect(request_error.response.status).toBe(401)

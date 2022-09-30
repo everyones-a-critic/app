@@ -1,8 +1,5 @@
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-
-import SignUp from './SignUp'
-import SignIn from './SignIn'
-import ConfirmAccount from "./ConfirmAccount";
+import { Provider } from 'react-redux';
 
 import { mockClient } from 'aws-sdk-client-mock';
 import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
@@ -12,15 +9,23 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
-import store from '../../src/app/store';
-import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit'
+import accountReducer from "../features/account/accountSlice";
 
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
 
+import SignUp from './SignUp'
+import SignIn from './SignIn'
+import ConfirmAccount from "./ConfirmAccount";
+
+
+let store;
 beforeEach(() => {
     cognitoMock.reset();
+    store = configureStore({
+        reducer: {
+            account: accountReducer,
+        }
+    });
 });
 
 test('When password is invalid', async () => {

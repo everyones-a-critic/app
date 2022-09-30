@@ -6,6 +6,10 @@ import SignIn from './SignIn'
 import ConfirmAccount from "./ConfirmAccount";
 import CommunityEnrollment from "./CommunityEnrollment";
 
+import { configureStore } from '@reduxjs/toolkit';
+import accountReducer from "../features/account/accountSlice";
+import communitiesReducer from "../features/communities/communitiesSlice";
+
 import { mockClient } from 'aws-sdk-client-mock';
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
@@ -14,26 +18,19 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
-import store from '../../src/app/store';
 import { Provider } from 'react-redux';
-
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
-
 import { setItemAsync } from "expo-secure-store";
-jest.mock("expo-secure-store")
-jest.mock('expo-secure-store', () => {
-    return {
-        __esModule: true,
-        setItemAsync: jest.fn(() => Promise)
-    }
-});
-//
-// SecureStore.setItemAsync = jest.fn()
 
+
+let store;
 beforeEach(() => {
     cognitoMock.reset();
+    store = configureStore({
+        reducer: {
+            account: accountReducer,
+            communities: communitiesReducer,
+        }
+    });
 });
 
 test('When username or password is invalid', async () => {
@@ -117,7 +114,6 @@ describe("When sign in is successful, ", () => {
         fireEvent.changeText(emailInput, 'test@test.com')
         const passwordInput = screen.getByLabelText("Password Entry")
         fireEvent.changeText(passwordInput, 'test')
-        fireEvent.press(screen.getByText("Sign In"))
         await waitFor(() => {
             fireEvent.press(screen.getByText("Sign In"))
         });
@@ -152,4 +148,49 @@ describe("When sign in is successful, ", () => {
         });
         expect(screen.getByText("Confirmation Code")).toBeTruthy()
     });
+});
+
+test('When "next" route param is provided, successful sign in navigates to that page', async () => {
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test IdToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
+
+    const screen = render(
+        <Provider store={ store }>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Sign In" initialParams={{ next: 'Sign Up' }} component={ SignIn } options={{ headerShown: false }} />
+                    <Stack.Screen name="Sign Up" component={ SignUp } options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
+
+    const emailInput = screen.getByLabelText("Email Entry")
+    fireEvent.changeText(emailInput, 'test@test.com')
+    const passwordInput = screen.getByLabelText("Password Entry")
+    fireEvent.changeText(passwordInput, 'test')
+
+    await waitFor(() => {
+        fireEvent.press(screen.getByText("Sign In"));
+    });
+    expect(screen.getByAccessibilityHint("Navigate to Sign In page")).toBeTruthy();
+});
+
+test('When "message" route param is provided, it should be rendered on the screen', async () => {
+    const screen = render(
+        <Provider store={ store }>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Sign In" initialParams={{ customMessage: 'Hello there' }} component={ SignIn } options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
+
+    expect(screen.getByText("Hello there")).toBeTruthy();
 });

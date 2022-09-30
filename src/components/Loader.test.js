@@ -3,9 +3,6 @@ import {Text} from "react-native";
 
 import Loader from "./Loader";
 
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
 
 jest.useFakeTimers();
 jest.spyOn(global, 'setTimeout');
@@ -48,6 +45,24 @@ describe('when loading is', () => {
         expect(screen.getByRole("alert")).toHaveTextContent("I should render");
 
         jest.advanceTimersByTime(1000);
+        // // this is not possible to test, because of the issue with the testing library reported here:
+        // // https://github.com/callstack/react-native-testing-library/issues/1069
+        // expect(screen.getByTestId("spinner")).toHaveStyle({display: 'flex'});
+    })
+
+    test('if contentOverlay is false, overlay should not render, spinner should immediately render', ()=> {
+        const screen = render(<Loader loading={true} contentOverlay={false} />);
+
+        let notFound = false;
+        try {
+            screen.getByLabelText('Content Cover')
+        } catch(e) {
+            notFound = true;
+        }
+
+        expect(notFound).toBeTruthy();
+        // expect(screen.getByTestId("spinner")).toHaveStyle({display: 'flex'});
+
         // // this is not possible to test, because of the issue with the testing library reported here:
         // // https://github.com/callstack/react-native-testing-library/issues/1069
         // expect(screen.getByTestId("spinner")).toHaveStyle({display: 'flex'});

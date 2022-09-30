@@ -44,7 +44,8 @@ class SignIn extends React.Component {
                 this.props.sendConfirmationCode();
                 this.props.navigation.navigate('Confirm Account', { email: this.state.email });
             } else {
-                this.props.navigation.navigate('Community Enrollment');
+                const next = this.props.route.params?.next || 'Community Enrollment';
+                this.props.navigation.navigate(next);
             }
         }
     }

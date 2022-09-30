@@ -27,11 +27,16 @@ class Loader extends React.Component {
     });
 
     initiateSpinner = () => {
+        let delay = 0;
+        if (this.props.contentOverlay) {
+            delay = 750;
+        }
+
         if (this.props.loading && this.timer === undefined) {
             this.timer = setTimeout(() => {
                 this.ref.current.setNativeProps({ style: { display: 'flex' }});
                 this.rotateSpinner();
-            }, 750);
+            }, delay);
         }
     }
 
@@ -50,18 +55,24 @@ class Loader extends React.Component {
         clearTimeout(this.timer);
     }
 
+    renderContentCover = () => {
+        if (this.props.contentOverlay) {
+            return <View style={[ style.absolute, style.overlay ]} accessibilityLabel="Content Cover" />
+        }
+    }
+
     renderSpinner = () => {
         if (this.props.loading) {
             return (
                 <React.Fragment>
-                    <View style={[ style.absolute, style.overlay ]} accessibilityLabel="Content Cover" />
-                    <View style={[ style.absolute, style.spinnerContainer ]} accessibilityLabel="Loading">
+                    { this.renderContentCover() }
+                    <View style={[ style.absolute, style.spinnerContainer, { minHeight: this.props.minHeight} ]} accessibilityLabel="Loading">
                         <Animated.Text testID={"spinner"} ref={this.ref} style={[
-                            style.spinner,
+                            { height: this.props.size, width: this.props.size },
                             { display: 'none'},
                             {transform: [{ rotate: this.spin }]}
                         ]}>
-                            <FontAwesomeIcon size={ 50 } color={'black'}  icon={faSpinner} />
+                            <FontAwesomeIcon style={{ transform: [{translateY: 2 }]}} size={ this.props.size } color={ this.props.color }  icon={faSpinner} />
                         </Animated.Text>
                     </View>
                 </React.Fragment>
@@ -94,10 +105,6 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         zIndex: 2
     },
-    spinner: {
-        width: 50,
-        height: 45,
-    },
     overlay: {
         zIndex: 1,
         backgroundColor: 'black',
@@ -107,6 +114,13 @@ const style = StyleSheet.create({
         zIndex: 0,
     }
 });
+
+Loader.defaultProps = {
+    contentOverlay: true,
+    color: 'black',
+    size: 50,
+    minHeight: 0
+}
 
 export default Loader;
 

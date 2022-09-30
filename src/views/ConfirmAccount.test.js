@@ -1,7 +1,11 @@
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { Provider } from 'react-redux';
 
 import ConfirmAccount from "./ConfirmAccount";
 import SignIn from "./SignIn";
+
+import { configureStore } from '@reduxjs/toolkit';
+import accountReducer from "../features/account/accountSlice";
 
 import { mockClient } from 'aws-sdk-client-mock';
 import { CognitoIdentityProviderClient, ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
@@ -11,15 +15,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
-import store from '../../src/app/store';
-import { Provider } from 'react-redux';
 
-jest.mock('@fortawesome/react-native-fontawesome', () => ({
-    FontAwesomeIcon: ''
-}))
-
+let store;
 beforeEach(() => {
     cognitoMock.reset();
+    store = configureStore({
+        reducer: {
+            account: accountReducer,
+        }
+    });
 });
 
 test('When confirmation code is invalid', async () => {
