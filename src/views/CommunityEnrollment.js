@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, ScrollView, View, StyleSheet, TextInput, Animated, Dimensions, Modal } from 'react-native';
+import { Text, ScrollView, View, StyleSheet, TextInput, Animated, Dimensions, Modal, StatusBar } from 'react-native';
+import { SafeAreaProvider, SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
 import { connect } from "react-redux";
 
@@ -156,7 +157,9 @@ class CommunityEnrollment extends React.Component {
             let action;
             let actionType;
             if (itemType === "member") {
-                action = () => this.props.navigation.navigate('Community Home', { communityId: community.id })
+                action = () => {
+                    this.props.navigation.navigate('Community Home', { communityId: community.id })
+                }
                 actionType = "enter"
             } else {
                 action = () => this.props.joinCommunity(community);
@@ -172,8 +175,7 @@ class CommunityEnrollment extends React.Component {
                     accessibilityRole={ actionType === 'enter' ? 'link' : 'button' }
                     accessibilityHint={ actionType === 'enter' ? `Tap to open the ${community.display_name} page` : `Tap to join the ${community.display_name} community` }
                     style={ style }
-                    hidden={ actionType === 'enter' ? deleted : null }
-                />
+                    hidden={ actionType === 'enter' ? deleted : null }/>
             )
 
             if (swipeFunction !== undefined) {
@@ -185,9 +187,8 @@ class CommunityEnrollment extends React.Component {
                         accessibilityHint={`Slide to reveal menu options for the ${community.name} community`}
                         friction={2}
                         rightThreshold={40}
-                        renderRightActions={ progress => this.renderDeleteButton(progress, community) }
-                    >
-                        { [ communityComponent ] }
+                        renderRightActions={ progress => this.renderDeleteButton(progress, community) }>
+                            { [ communityComponent ] }
                     </Swipeable>
                 )
             } else {
@@ -209,8 +210,7 @@ class CommunityEnrollment extends React.Component {
                     contentOverlay={ false }
                     size={ 30 }
                     color={ GRAY }
-                    minHeight={ 50 }
-                />
+                    minHeight={ 50 }/>
             </React.Fragment>
         );
     }
@@ -264,58 +264,69 @@ class CommunityEnrollment extends React.Component {
                 requestStatus={ this.getRequestStatus() }
                 navigation={ this.props.navigation }
             >
-                <View style={ styles.background }>
-                    <View style={ styles.foreground }>
-                        <View style={ styles.header }>
-                            <Text style={ styles.headerText }>Communities</Text>
-                        </View>
-                        <ScrollView
-                            nestedScrollEnabled={ true }
-                            decelerationRate={ 0.25 }
-                            contentContainerStyle={{ paddingBottom: 75 }}
-                        >
-                            { this.renderEnrolledCommunitiesSection() }
-                            <View
-                                style={styles.searchContainer}
-                                onLayout={ (e)=> this.setState({ searchSectionHeight: e.nativeEvent.layout.height }) }
-                            >
-                                <View style={[ styles.subHeader ]}>
-                                    <Text style={ styles.subHeaderText }>Join a Community</Text>
-                                </View>
-                                <View style={ styles.searchInputContainer }>
-                                    <FontAwesomeIcon size={ 20 } icon={findIconDefinition({prefix: 'fas', iconName: "magnifying-glass"})} />
-                                    <TextInput
-                                        accessibilityRole="search"
-                                        accessibilityHint="Search communities you are able to join"
-                                        accessibilityLabel="Search Communities"
-                                        style={ styles.searchInput }
-                                        onSubmitEditing={ () => this.searchSubmit() }
-                                        onChangeText={ (text) => this.setState({ searchString: text }) }
-                                        returnKeyLabel="search"
-                                        returnKeyType="search"
-                                    />
-                                </View>
+                <SafeAreaProvider>
+                    <SafeAreaInsetsContext.Consumer>
+                        {insets => <View style= {{ flex: 1 }}>
+                            <View style={{ height: insets.top, backgroundColor: YELLOW }}>
+                                <StatusBar backgroundColor={ YELLOW } barStyle={ 'dark-content' } />
                             </View>
-                            <View style={[ styles.subHeader ]}>
-                                <Text style={[ styles.subHeaderText ]}>{ this.state.availableCommunitiesText }</Text>
+                            <View style={ styles.foreground }>
+                                <View style={[ styles.header, this.props.renderAsBottomSheet ? styles.bottomSheetHeader : {} ]}>
+                                    <Text style={ styles.headerText }>Communities</Text>
+                                </View>
+                                <ScrollView
+                                    nestedScrollEnabled={ true }
+                                    decelerationRate={ 0.25 }
+                                    contentContainerStyle={{ paddingBottom: 75 }}
+                                >
+                                    { this.renderEnrolledCommunitiesSection() }
+                                    <View
+                                        style={styles.searchContainer}
+                                        onLayout={ (e)=> this.setState({ searchSectionHeight: e.nativeEvent.layout.height }) }
+                                    >
+                                        <View style={[ styles.subHeader ]}>
+                                            <Text style={ styles.subHeaderText }>Join a Community</Text>
+                                        </View>
+                                        <View style={ styles.searchInputContainer }>
+                                            <FontAwesomeIcon size={ 20 } icon={findIconDefinition({prefix: 'fas', iconName: "magnifying-glass"})} />
+                                            <TextInput
+                                                accessibilityRole="search"
+                                                accessibilityHint="Search communities you are able to join"
+                                                accessibilityLabel="Search Communities"
+                                                style={ styles.searchInput }
+                                                onSubmitEditing={ () => this.searchSubmit() }
+                                                onChangeText={ (text) => this.setState({ searchString: text }) }
+                                                returnKeyLabel="search"
+                                                returnKeyType="search"
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={[ styles.subHeader ]}>
+                                        <Text style={[ styles.subHeaderText ]}>{ this.state.availableCommunitiesText }</Text>
+                                    </View>
+                                    <ScrollView
+                                        accessibilityHint="Scroll to see more communities to join."
+                                        style={[ styles.communitiesContainer, {
+                                            height: Math.max(350, (dimensions.height - 180 - this.state.enrolledSectionHeight - this.state.searchSectionHeight)),
+                                        }]}
+                                        nestedScrollEnabled={true}
+                                        onScrollEndDrag={ ({ nativeEvent}) => this.handleScroll(nativeEvent) }>
+                                        { this.renderAvailableCommunitiesList() }
+                                    </ScrollView>
+                                </ScrollView>
                             </View>
-                            <ScrollView
-                                accessibilityHint="Scroll to see more communities to join."
-                                style={[ styles.communitiesContainer, {
-                                    height: Math.max(350, (dimensions.height - 180 - this.state.enrolledSectionHeight - this.state.searchSectionHeight)),
-                                }]}
-                                nestedScrollEnabled={true}
-                                onScrollEndDrag={ ({ nativeEvent}) => this.handleScroll(nativeEvent) }>
-                                { this.renderAvailableCommunitiesList() }
-                            </ScrollView>
-                        </ScrollView>
-                    </View>
-                    <ErrorModal errors={ this.props.errors }/>
-                </View>
+                            <ErrorModal errors={ this.props.errors }/>
+                        </View>}
+                    </SafeAreaInsetsContext.Consumer>
+                </SafeAreaProvider>
             </AuthenticationProvider>
         )
     }
 }
+
+CommunityEnrollment.defaultProps = {
+	renderAsBottomSheet: false
+};
 
 const styles = StyleSheet.create({
     background: {
@@ -325,7 +336,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'black'
     },
     foreground: {
-        marginTop: 50,
         width: '100%',
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
@@ -334,13 +344,15 @@ const styles = StyleSheet.create({
     header: {
         backgroundColor: YELLOW,
         width: '100%',
-        height: 55,
+        paddingTop: 10,
+        paddingBottom: 10,
         alignItems: 'center',
         justifyContent: 'center',
         borderBottomColor: 'black',
         borderBottomWidth: 1,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
+    },
+    bottomSheetHeader: {
+        paddingTop: 0,
     },
     communitiesContainer: {
         paddingBottom: 25

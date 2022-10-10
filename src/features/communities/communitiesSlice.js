@@ -4,8 +4,37 @@ import api from "../../api";
 
 
 // TODO:
-//  - Get One Community
 //  - Implement pagination for search results
+
+export const getCommunity = createAsyncThunk('communities/getOne', async (data, { getState, rejectWithValue }) => {
+    const allCommunities = getState().communities.all;
+    const community = allCommunities.find(comm => {
+        if (comm.id === data.id) {
+            return comm;
+        }
+    });
+
+    if(community !== undefined) {
+        return community;
+    } else {
+        try {
+            const response = await api.get(`communities/${data.id}/`)
+            const community = response.data;
+            community.id = community._id['$oid'];
+            delete community._id['$oid'];
+            return community;
+        } catch(error) {
+            if (error?.response?.status !== undefined && error?.response?.data?.message !== undefined) {
+                return rejectWithValue({
+                    status: error.response.status,
+                    message: error.response.data.message
+                });
+            } else {
+                throw error;
+            }
+        }
+    }
+});
 
 export const listMoreCommunities = createAsyncThunk('communities/list', async (data, { getState, rejectWithValue }) => {
     try {
@@ -130,6 +159,10 @@ export const leaveCommunity = createAsyncThunk('communities/leave', async (commu
 export const communitiesSlice = createSlice({
     name: 'communities',
     initialState: {
+        focusedCommunity: null,
+        getOneRequestMetadata: {
+            status: 'idle'
+        },
         all: [],
         allCommunitiesRequestMetadata: {
             next: '/communities?page=1',
@@ -243,6 +276,31 @@ export const communitiesSlice = createSlice({
                 switch(action.payload?.status) {
                     case 401:
                         state.searchRequestMetadata.status = 'expiredAuth';
+                        break;
+                    default:
+                        state.errors = [action.payload?.message || action.error.message]
+                }
+            })
+            .addCase(getCommunity.pending, (state, action) => {
+                state.getOneRequestMetadata.status = 'loading';
+                state.errors = [];
+            })
+            .addCase(getCommunity.fulfilled, (state, action) => {
+                state.getOneRequestMetadata.status = 'succeeded';
+                state.focusedCommunity = action.payload;
+                if (state.all.findIndex(x => x.id == action.payload.id) === -1) {
+                    state.all.push(action.payload)
+                }
+                state.errors = [];
+            })
+            .addCase(getCommunity.rejected, (state, action) => {
+                console.log("error:")
+                console.log(action.error)
+                console.log(action.payload)
+                state.getOneRequestMetadata.status = 'failed';
+                switch(action.payload?.status) {
+                    case 401:
+                        state.getOneRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
                         state.errors = [action.payload?.message || action.error.message]

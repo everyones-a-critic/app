@@ -11,7 +11,7 @@ import SignIn from "./src/views/SignIn";
 import ConfirmAccount from "./src/views/ConfirmAccount";
 import CommunityEnrollment from "./src/views/CommunityEnrollment";
 import CommunityHome from "./src/views/CommunityHome";
-import Foo from "./src/views/Foo";
+import ProductHome from "./src/views/ProductHome";
 
 import { FocusedElementContext } from "./src/context/focusedElement";
 
@@ -38,6 +38,9 @@ const App = () => {
                                       options={{ headerShown: false }} />
                         <Stack.Screen name="Confirm Account"
                                       component={ ConfirmAccount }
+                                      options={{ headerShown: false }} />
+                        <Stack.Screen name="Product Home"
+                                      component={ ProductHome }
                                       options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </FocusedElementContext.Provider>

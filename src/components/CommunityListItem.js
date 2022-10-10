@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Pressable, Text, View, StyleSheet, findNodeHandle } from "react-native";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -29,15 +29,25 @@ const renderActionIcon = type => {
     }
 }
 
-
-
+let isMounted;
 const CommunityListItem = ({ community, style, action, actionType, hidden, accessibilityRole, accessibilityHint }) => {
     const [disabled, setDisabled ] = useState(false);
 
-    const onPress = () => {
+    const onPress = async () => {
         setDisabled(true);
-        action();
+        await action();
+        if (isMounted) {
+            setDisabled(false);
+        }
     }
+
+    useEffect(() => {
+        isMounted = true;
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const iconDef = findIconDefinition({prefix: 'fas', iconName: community.icon})
     return (

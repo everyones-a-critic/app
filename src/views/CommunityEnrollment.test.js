@@ -11,6 +11,7 @@ import { Provider } from 'react-redux';
 
 import communitiesReducer from "../features/communities/communitiesSlice";
 import accountReducer from "../features/account/accountSlice";
+import productsReducer from "../features/products/productsSlice";
 import CommunityEnrollment from "./CommunityEnrollment";
 import CommunityHome from "./CommunityHome";
 import SignIn from "./SignIn";
@@ -23,6 +24,7 @@ beforeEach(() => {
         reducer: {
             account: accountReducer,
             communities: communitiesReducer,
+            products: productsReducer,
         }
     });
 
@@ -214,8 +216,8 @@ test('On press enrolled community, navigate to ', async () => {
                 </NavigationContainer>
             </Provider>
         );
+        fireEvent(screen.getByAccessibilityHint('Tap to open the 3 page'), 'press');
     });
-    fireEvent(screen.getByAccessibilityHint('Tap to open the 3 page'), 'press');
     expect(screen.getByRole('header')).toHaveTextContent('3');
 });
 
