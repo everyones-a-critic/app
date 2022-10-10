@@ -196,7 +196,11 @@ export const communitiesSlice = createSlice({
             .addCase(listMoreCommunities.fulfilled, (state, action) => {
                 state.allCommunitiesRequestMetadata.status = 'succeeded';
                 state.allCommunitiesRequestMetadata.next = action.payload.next;
-                state.all = state.all.concat(action.payload.communities);
+                action.payload.communities.forEach(newCommunity => {
+                    if (state.all.findIndex(existingCommunity => existingCommunity.id === newCommunity.id) === -1) {
+                        state.all.push(newCommunity)
+                    }
+                });
             })
             .addCase(listMoreCommunities.rejected, (state, action) => {
                 state.allCommunitiesRequestMetadata.status = 'failed';
@@ -288,7 +292,7 @@ export const communitiesSlice = createSlice({
             .addCase(getCommunity.fulfilled, (state, action) => {
                 state.getOneRequestMetadata.status = 'succeeded';
                 state.focusedCommunity = action.payload;
-                if (state.all.findIndex(x => x.id == action.payload.id) === -1) {
+                if (state.all.findIndex(existingCommunity => existingCommunity.id == action.payload.id) === -1) {
                     state.all.push(action.payload)
                 }
                 state.errors = [];
