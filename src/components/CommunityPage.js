@@ -18,8 +18,7 @@ const CommunityPage = ({ community, navigation, route, requestStatus, errors, ch
     const bottomSheetRef = useRef(null);
 
     let [fontsLoaded] = useFonts({
-        WorkSans_800ExtraBold,
-        'IcoMoon': require('../../assets/fonts/icomoon.ttf'),
+        WorkSans_800ExtraBold
     });
 
     useEffect(() => {
