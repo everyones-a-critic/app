@@ -12,6 +12,7 @@ import ConfirmAccount from "./src/views/ConfirmAccount";
 import CommunityEnrollment from "./src/views/CommunityEnrollment";
 import CommunityHome from "./src/views/CommunityHome";
 import ProductHome from "./src/views/ProductHome";
+import SplashScreen from "./src/views/SplashScreen";
 
 import { FocusedElementContext } from "./src/context/focusedElement";
 
@@ -24,6 +25,9 @@ const App = () => {
             <NavigationContainer>
                 <FocusedElementContext.Provider value={{ focusedElement, setFocusedElement }}>
                     <Stack.Navigator>
+                        <Stack.Screen name="Splash Screen"
+                                      component={ SplashScreen }
+                                      options={{ headerShown: false }} />
                         <Stack.Screen name="Community Enrollment"
                                       component={ CommunityEnrollment }
                                       options={{ headerShown: false }} />

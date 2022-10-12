@@ -34,7 +34,8 @@ const CommunityPage = ({ community, navigation, route, requestStatus, errors, ch
             return children;
         }
     }
-
+    console.log("Rendering community page with following loading attr: ")
+    console.log(loading || community === undefined || community === null || !fontsLoaded)
     return (
         <AuthenticationProvider
             requestStatus={ requestStatus }

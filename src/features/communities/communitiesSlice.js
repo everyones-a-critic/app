@@ -19,9 +19,12 @@ export const getCommunity = createAsyncThunk('communities/getOne', async (data, 
     } else {
         try {
             const response = await api.get(`communities/${data.id}/`)
-            const community = response.data;
+
+            const community = {};
+            Object.assign(community, response.data);
             community.id = community._id['$oid'];
-            delete community._id['$oid'];
+            delete community._id;
+
             return community;
         } catch(error) {
             if (error?.response?.status !== undefined && error?.response?.data?.message !== undefined) {

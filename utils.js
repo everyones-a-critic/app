@@ -31,3 +31,11 @@ export const pickBarStyle = (bgColor) => {
 
     return (L > 0.179) ? 'dark-content' : 'light-content';
 };
+
+export const hexToRGB = hexColor => {
+    const r = parseInt(hexColor.slice(0, 2), 16)
+    const g = parseInt(hexColor.slice(2, 4), 16)
+    const b = parseInt(hexColor.slice(4, 6), 16)
+
+    return `rgb(${r},${g},${b})`;
+};

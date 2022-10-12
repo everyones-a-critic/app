@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, FlatList } from "react-native";
 import { connect } from "react-redux";
+import { setItemAsync } from 'expo-secure-store';
 
 import { getCommunity } from "../features/communities/communitiesSlice";
 import { listMoreProducts } from "../features/products/productsSlice";
@@ -18,17 +19,18 @@ import ProductCard from "../components/ProductCard";
 
 
 const CommunityHome = (props) => {
+    const communityId = props.route.params?.communityId;
     const getMoreProducts = () => {
-        const communityId = props.route.params.communityId;
-        if (!props.productsLoading) {
+        if (!props.productsLoading && communityId != null) {
             props.listMoreProducts({ communityId: communityId })
         }
     }
 
     useEffect(() => {
+        setItemAsync('MostRecentCommunityId', props.route.params.communityId);
         props.getCommunity({ id: props.route.params.communityId });
         getMoreProducts();
-    }, [ props.route.params?.communityId ]);
+    }, [ communityId ]);
 
     const community = props.community;
     const allProducts = props.allProducts[community?.id] || [];
@@ -81,15 +83,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => {
     const checkForLoadingProductsRequests = () => {
         return Object.keys(state.products.allByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allByCommunityRequestMetadata.key?.status === 'loading') {
+            if (state.products.allByCommunityRequestMetadata[key]?.status === 'loading') {
                 return true;
             }
-        });
+        }) || false;
     };
 
     const checkForExpiredAuth = () => {
         const productAuthExpired = Object.keys(state.products.allByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allByCommunityRequestMetadata.key?.status === 'expiredAuth') {
+            if (state.products.allByCommunityRequestMetadata[key]?.status === 'expiredAuth') {
                 return true;
             }
         });
