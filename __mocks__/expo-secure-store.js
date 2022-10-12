@@ -1,4 +1,4 @@
-import { mockStore } from '../testing/apiMockResources';
+import { mockStore } from '../testing/secureStoreMockResources';
 
 const expo_secure_store = jest.createMockFromModule('expo-secure-store');
 
