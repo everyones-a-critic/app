@@ -42,10 +42,11 @@ const CommunityHeader = ({ community, bottomSheet, fontsLoaded }) => {
                             style = {[ styles.headerText, { color: secondaryColor }]}>
                                 { community?.name }
                         </Text>
-                        <Text style={{ marginLeft: 5, marginTop: 5 }}>
+                        <Text style={{ marginTop: 5 }}>
                             <FontAwesomeIcon
+                                style={{ transform: [{translateX: 8 }] }}
                                 color={ secondaryColor }
-                                size={ 18 }
+                                size={ 22 }
                                 icon={ findIconDefinition({prefix: 'fas', iconName: 'angle-down' }) } />
                         </Text>
                     </Pressable>
