@@ -218,7 +218,8 @@ test('On press enrolled community, navigate to ', async () => {
         );
         fireEvent(screen.getByAccessibilityHint('Tap to open the 3 page'), 'press');
     });
-    expect(screen.getByRole('header')).toHaveTextContent('3');
+    const headerElements = screen.getAllByRole('header')
+    expect(headerElements[0]).toHaveTextContent('3');
 });
 
 describe('Error modal renders', () => {
