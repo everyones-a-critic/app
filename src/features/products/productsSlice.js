@@ -7,7 +7,7 @@ export const getProduct = createAsyncThunk('products/getOne', async (data, { get
     const allProducts = getState().products.all;
     const product = allProducts.find(prod => {
         if (prod.id === data.id) {
-            return comm;
+            return prod;
         }
     });
 
