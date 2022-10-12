@@ -114,7 +114,6 @@ const SplashScreen = props => {
 
     useEffect(() => {
         if (readyFor === "navigateToCommunityHome") {
-            console.log("Navigating to community home")
             props.navigation.navigate('Community Home', { communityId: props.community.id });
         }
     }, [ readyFor ]);

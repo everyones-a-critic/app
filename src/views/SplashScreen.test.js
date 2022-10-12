@@ -168,8 +168,6 @@ test('when refresh token exists, but auth error is received on get community, na
 });
 
 test('when refresh token exists, but no community focused, user is navigated to Community Enrollment', async () => {
-    console.log("\n--------------------")
-    console.log("when refresh token exists, but no community focused, user is navigated to Community Enrollment")
     const overrideMap = {
         RefreshToken: 'Some Token'
     }
@@ -187,8 +185,6 @@ test('when refresh token exists, but no community focused, user is navigated to 
 });
 
 test('when refresh token exists and get community is successful, we end up on community page', async () => {
-    console.log("\n--------------------")
-    console.log("when refresh token exists and get community is successful, we end up on community page")
     const screen = await renderSplashScreen();
     await act(async() => {
         // 3 seconds for initial animations to work and data to load
