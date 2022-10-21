@@ -64,7 +64,7 @@ api.interceptors.response.use(response => response, async error => {
             // }
         } catch (e) {
             if (e?.name === "NotAuthorizedException") {
-                return error;
+                throw error;
             } else {
                 throw e;
             }
@@ -77,10 +77,10 @@ api.interceptors.response.use(response => response, async error => {
             delete error.config.headers.Authorization;
             return await api.request(error.config);
         } else {
-            return error;
+            throw error;
         }
     } else {
-        return error;
+        throw error;
     }
 });
 

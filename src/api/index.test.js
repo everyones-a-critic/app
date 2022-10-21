@@ -96,6 +96,14 @@ test("A non 401 error response is returned", async () => {
       }
     }
 
-    const request_error = await api.interceptors.response.handlers[0].rejected(error);
+    let request_error;
+    try {
+        await api.interceptors.response.handlers[0].rejected(error);
+    } catch (e) {
+        request_error = e
+        console.log("error: ")
+        console.log(request_error)
+    }
+
     expect(request_error.response.status).toBe(403)
 });
