@@ -6,7 +6,7 @@ import { setItemAsync } from 'expo-secure-store';
 import { getCommunity } from "../features/communities/communitiesSlice";
 import { listMoreProducts } from "../features/products/productsSlice";
 import CommunityPage from  "../components/CommunityPage";
-import PillSet from "../components/PillSet";
+import PillBox from "../components/PillBox";
 import Pill from "../components/Pill";
 import ProductCard from "../components/ProductCard";
 
@@ -44,19 +44,17 @@ const CommunityHome = (props) => {
             navigation={ props.navigation }
             errors = { props.errors }
         >
-            <PillSet style={ styles.pillContainer }>
-                <Pill
-                    title={ "Recommended" }
-                    primaryColor={ `#${community?.primary_color}` }
-                    secondaryColor={ `#${community?.secondary_color}` }
-                    startSelected
-                />
-                <Pill
-                    title={ "Your Reviews" }
-                    primaryColor={ `#${community?.primary_color}` }
-                    secondaryColor={ `#${community?.secondary_color}` }
-                />
-            </PillSet>
+            <PillBox
+                scrollable style={ styles.pillContainer }
+                pills={[
+                    { value: "Browse" },
+                    { value: "Your Reviews" },
+                ]}
+                primaryColor={ `#${community?.primary_color}` }
+                secondaryColor={ `#${community?.secondary_color}` }
+                selection={ "Browse" }
+                pillContainerStyle={ styles.pill }
+            />
             <FlatList
                 removeClippedSubviews
                 showsVerticalScrollIndicator={ false }
@@ -76,8 +74,18 @@ const CommunityHome = (props) => {
 const styles = StyleSheet.create({
     pillContainer: {
         marginBottom: 15,
+        paddingLeft: 15,
         height: 70,
     },
+    pill: {
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+        borderTopRightRadius: 8,
+        borderBottomRightRadius: 8,
+        borderTopLeftRadius: 8,
+        borderBottomLeftRadius: 8,
+        margin: 10,
+    }
 });
 
 const mapStateToProps = state => {

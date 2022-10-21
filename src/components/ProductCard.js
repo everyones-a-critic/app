@@ -1,16 +1,9 @@
 import React, { useState, memo } from 'react';
 import { Text, View, StyleSheet, Pressable, Image } from "react-native";
 import Field from "../components/Field";
+import FieldSet from "../components/FieldSet";
 
 const ProductCard = ({ product, fields, navigation }) => {
-    const renderFields = () => {
-        const field_elements = fields.map(field => {
-            return <Field key={ field.name } data={ product } fieldMetadata={ field } />;
-        });
-
-        return <React.Fragment>{ field_elements }</React.Fragment>;
-    }
-
     const navigateToProductPage = () => {
         navigation.navigate('Product Home', {
             productId: product.id,
@@ -51,7 +44,7 @@ const ProductCard = ({ product, fields, navigation }) => {
                             { product.name }
                     </Text>
                 </View>
-                { renderFields() }
+                <FieldSet fields={ fields } data={ product } />
             </Pressable>
         </View>
     );

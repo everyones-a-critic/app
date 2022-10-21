@@ -2,24 +2,29 @@ import React, { useState } from 'react';
 import { Text, View, StyleSheet, Pressable } from "react-native";
 
 const Pill = props => {
-    const [selected, setSelected] = useState(props.startSelected);
+    const selected = props.selectedValue === props.value;
 
     return (
         <Pressable
+            accessibilityRole="radio"
+            accessibilityValue={{ text: props.value }}
+            onPress = { () => {
+                props.setSelectedValue(props.value)
+            }}
             style={[
                 {
                     backgroundColor: selected ? props.primaryColor : 'transparent',
                     borderColor: props.primaryColor,
                 },
                 styles.pillContainer,
-                props.style
+                props.containerStyle
             ]}>
             <Text style={[
                 {
                     color: selected ? props.secondaryColor : props.primaryColor,
-                    fontWeight: selected ? "500" : "300"
                 },
-                styles.pillText
+                styles.pillText,
+                props.textStyle
             ]}>
                 { props.title }
             </Text>
@@ -29,25 +34,29 @@ const Pill = props => {
 
 const styles = StyleSheet.create({
     pillContainer: {
-        borderRadius: 12,
-        borderWidth: 2,
         paddingTop: 8,
         paddingBottom: 8,
         paddingLeft: 16,
         paddingRight: 16,
-        margin: 10
+        borderTopWidth: 2,
+        borderBottomWidth: 2,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
     },
     pillText: {
         fontFamily: "Helvetica Neue",
-        fontSize: 16
+        fontSize: 16,
+        lineHeight: 18,
+        fontWeight: "500",
     }
 });
 
 Pill.defaultProps = {
-    style: {},
+    containerStyle: {},
     primaryColor: "black",
     secondaryColor: "white",
-    startSelected: false
+    startSelected: false,
+    textStyle: {}
 };
 
 export default Pill;

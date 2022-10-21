@@ -14,7 +14,7 @@ import ErrorModal from "./ErrorModal";
 import { YELLOW, GRAY } from "../settings/colors";
 
 
-const CommunityPage = ({ community, navigation, route, requestStatus, errors, children, loading }) => {
+const CommunityPage = ({ community, navigation, route, requestStatus, errors, children, loading, backButtonEnabled }) => {
     const bottomSheetRef = useRef(null);
 
     let [fontsLoaded] = useFonts({
@@ -43,7 +43,13 @@ const CommunityPage = ({ community, navigation, route, requestStatus, errors, ch
             <Loader loading={ loading || community === undefined || community === null || !fontsLoaded }>
                 <SafeAreaProvider>
                     <View style={{ flex: 1 }}>
-                        <CommunityHeader fontsLoaded={ fontsLoaded } community={ community } bottomSheet={ bottomSheetRef } />
+                        <CommunityHeader
+                            fontsLoaded={ fontsLoaded }
+                            community={ community }
+                            bottomSheet={ bottomSheetRef }
+                            backButtonEnabled={ backButtonEnabled }
+                            navigation={ navigation }
+                        />
                         <View style={{ backgroundColor: "#F2F2F2" }}>
                             { renderChildren() }
                         </View>

@@ -11,8 +11,13 @@ axios.create.mockImplementation((config) => {
     }
 });
 axios.request.mockReturnThis();
-axios.post.mockReturnThis();
 axios.delete.mockReturnThis();
+axios.post.mockImplementation( url => {
+    return mockReturnValues.post[url] || {}
+});
+axios.patch.mockImplementation( url => {
+    return mockReturnValues.patch[url] || {}
+});
 axios.get.mockImplementation( url => {
     return mockReturnValues.get[url]
 });

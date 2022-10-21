@@ -22,26 +22,40 @@ const generateCommunities = (start, quantity) => {
     return results;
 };
 
+const generateProduct = i => {
+    return {
+        "id": (i).toString(),
+        "display_name": (i).toString(),
+        "name": (i).toString(),
+        "brand": "Some Brand",
+        "categories": [
+            "Category 1",
+            "Category 2",
+        ],
+        "community_id": (i % 2 ? "3" : "6"),
+        "image_url": "",
+        "price": 30,
+        "price_per": "10 servings",
+        "sample_1": "1",
+        "sample_2": "2",
+    }
+};
+
+const generateRating = (i, productId, archived) => {
+    return {
+        id: i,
+        productId: productId,
+        rating: 3.67,
+        archived: archived || false,
+        comments: "This is a test",
+    }
+}
+
 const generateProducts = (start, quantity) => {
     let i = 0
     let results = [];
     while (i < quantity) {
-        results.push({
-            "id": (start + i).toString(),
-            "display_name": (start + i).toString(),
-            "name": (start + i).toString(),
-            "brand": "Some Brand",
-            "categories": [
-                "Category 1",
-                "Category 2",
-            ],
-            "community_id": (i % 2 ? "3" : "6"),
-            "image_url": "",
-            "price": 30,
-            "price_per": "10 servings",
-            "sample_1": "1",
-            "sample_2": "2",
-        });
+        results.push(generateProduct(start + i));
         i++;
     }
     return results;
@@ -49,6 +63,20 @@ const generateProducts = (start, quantity) => {
 
 
 export const mockReturnValues = {
+    patch: {
+        '/products/1/ratings/1/': {
+            'statusCode': 200,
+            'headers': null,
+            'data': generateRating(1, 1, false)
+        }
+    },
+    post: {
+        '/products/1/ratings/': {
+            'statusCode': 200,
+            'headers': null,
+            'data': generateRating(1, 1, false)
+        }
+    },
     get: {
         '/communities?page=1': {
             "isBase64Encoded": true,
@@ -113,6 +141,20 @@ export const mockReturnValues = {
                 'next': null,
                 'previous': null,
                 'results': generateProducts(1, 25)
+            }
+        },
+        'products/1/': {
+            'statusCode': 200,
+            'headers': null,
+            'data': generateProduct(1)
+        },
+        '/products/1/ratings/?mostRecent=true': {
+            'statusCode': 200,
+            'headers': null,
+            'data': {
+                next: null,
+                previous: null,
+                results: [ generateRating(1, 1, false) ]
             }
         }
     }

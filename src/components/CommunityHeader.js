@@ -10,7 +10,7 @@ import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 import { pickBarStyle } from "../../utils";
 
 
-const CommunityHeader = ({ community, bottomSheet, fontsLoaded }) => {
+const CommunityHeader = ({ community, bottomSheet, fontsLoaded, backButtonEnabled, navigation }) => {
     const insets = useSafeAreaInsets();
 
     const navigateToCommunityEnrollment = () => {
@@ -26,10 +26,25 @@ const CommunityHeader = ({ community, bottomSheet, fontsLoaded }) => {
         iconName = community.icon;
     }
 
+    const renderBackButton = () => {
+        if (backButtonEnabled && navigation.canGoBack()) {
+            return (
+                <View style={{ width: '17%', alignItems: 'center' }}>
+                    <Pressable onPress={ () => navigation.goBack() }>
+                        <FontAwesomeIcon
+                            color={ secondaryColor } size={ 25 }
+                            icon={ findIconDefinition({prefix: 'fas', iconName: 'angle-left' }) } />
+                    </Pressable>
+                </View>
+            )
+        }
+    }
+
     const renderHeader = () => {
         if (fontsLoaded) {
             return (
                 <React.Fragment>
+                    { renderBackButton() }
                     <Pressable
                         accessibilityRole="link"
                         accessibilityLabel="Change Community"
@@ -86,5 +101,9 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     }
 });
+
+CommunityHeader.defaultProps = {
+    backButtonEnabled: false
+}
 
 export default CommunityHeader;
