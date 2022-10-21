@@ -22,8 +22,8 @@ const generateCommunities = (start, quantity) => {
     return results;
 };
 
-const generateProduct = i => {
-    return {
+const generateProduct = (i, withRatings) => {
+    let product = {
         "id": (i).toString(),
         "display_name": (i).toString(),
         "name": (i).toString(),
@@ -39,6 +39,12 @@ const generateProduct = i => {
         "sample_1": "1",
         "sample_2": "2",
     }
+
+    if (withRatings) {
+        product.rating = generateRating(i, i, false)
+    }
+
+    return product;
 };
 
 const generateRating = (i, productId, archived) => {
@@ -51,11 +57,11 @@ const generateRating = (i, productId, archived) => {
     }
 }
 
-const generateProducts = (start, quantity) => {
+const generateProducts = (start, quantity, withRatings) => {
     let i = 0
     let results = [];
     while (i < quantity) {
-        results.push(generateProduct(start + i));
+        results.push(generateProduct(start + i, withRatings));
         i++;
     }
     return results;
@@ -140,13 +146,13 @@ export const mockReturnValues = {
             'data': {
                 'next': null,
                 'previous': null,
-                'results': generateProducts(1, 25)
+                'results': generateProducts(1, 25, false)
             }
         },
         'products/1/': {
             'statusCode': 200,
             'headers': null,
-            'data': generateProduct(1)
+            'data': generateProduct(1, false)
         },
         '/products/1/ratings/?mostRecent=true': {
             'statusCode': 200,
@@ -156,6 +162,16 @@ export const mockReturnValues = {
                 previous: null,
                 results: [ generateRating(1, 1, false) ]
             }
+        },
+        '/products?page=1&size=5&communityId=3&withRatings=true': {
+            'statusCode': 200,
+            'headers': null,
+            'data': {
+                next: null,
+                previous: null,
+                results: generateProducts(1, 2, true)
+            }
+
         }
     }
 };

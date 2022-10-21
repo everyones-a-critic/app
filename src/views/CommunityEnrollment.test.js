@@ -12,6 +12,7 @@ import { Provider } from 'react-redux';
 import communitiesReducer from "../features/communities/communitiesSlice";
 import accountReducer from "../features/account/accountSlice";
 import productsReducer from "../features/products/productsSlice";
+import ratingsReducer from "../features/ratings/ratingsSlice";
 import CommunityEnrollment from "./CommunityEnrollment";
 import CommunityHome from "./CommunityHome";
 import SignIn from "./SignIn";
@@ -25,6 +26,7 @@ beforeEach(() => {
             account: accountReducer,
             communities: communitiesReducer,
             products: productsReducer,
+            ratings: ratingsReducer,
         }
     });
 

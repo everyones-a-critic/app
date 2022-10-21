@@ -55,6 +55,7 @@ const PillBox = props => {
         return (
             <ScrollView
                 accessibilityLabel= { props.accessibilityLabel }
+                accessibilityLabelledBy= { props.accessibilityLabelledBy }
                 accessibilityRole="radiogroup"
                 showsHorizontalScrollIndicator={ false }
                 horizontal={ true }

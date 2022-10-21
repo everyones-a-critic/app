@@ -25,13 +25,6 @@ const App = () => {
             <NavigationContainer>
                 <FocusedElementContext.Provider value={{ focusedElement, setFocusedElement }}>
                     <Stack.Navigator>
-                        <Stack.Screen name="Product Home"
-                                      component={ ProductHome }
-                                      initialParams = {{
-                                        communityId: '633c9a8ca8c3f241bf1df1b3',
-                                        productId: '633dcc5180a00f92bf00826c'
-                                      }}
-                                      options={{ headerShown: false }} />
                         <Stack.Screen name="Splash Screen"
                                       component={ SplashScreen }
                                       options={{ headerShown: false }} />
@@ -41,14 +34,17 @@ const App = () => {
                         <Stack.Screen name="Sign In"
                                       component={ SignIn }
                                       options={{ headerShown: false }} />
+                        <Stack.Screen name="Confirm Account"
+                                      component={ ConfirmAccount }
+                                      options={{ headerShown: false }} />
                         <Stack.Screen name="Community Enrollment"
                                       component={ CommunityEnrollment }
                                       options={{ headerShown: false }} />
                         <Stack.Screen name="Community Home"
                                       component={ CommunityHome }
                                       options={{ headerShown: false, gestureEnabled: false }} />
-                        <Stack.Screen name="Confirm Account"
-                                      component={ ConfirmAccount }
+                        <Stack.Screen name="Product Home"
+                                      component={ ProductHome }
                                       options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </FocusedElementContext.Provider>

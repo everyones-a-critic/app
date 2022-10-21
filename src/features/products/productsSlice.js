@@ -62,6 +62,39 @@ export const listMoreProducts = createAsyncThunk('products/list', async (data, {
     }
 });
 
+export const listMoreProductsWithRatings = createAsyncThunk('products/listWithRatings', async (data, { getState, rejectWithValue }) => {
+    let requestMetadata = getState().products.allWithRatingsByCommunityRequestMetadata[data.communityId];
+    let url = requestMetadata.next;
+    if (url === undefined) {
+        url = `/products?page=1&size=5&communityId=${data.communityId}&withRatings=true`;
+    } else if (url === null) {
+        return {
+            products: [],
+            communityFilter: data.communityId,
+            next: null
+        }
+    }
+
+    try {
+        const response = await api.get(url)
+        return {
+            products: response.data.results,
+            communityFilter: data.communityId,
+            next: response.data.next
+        }
+    } catch(error) {
+        if (error?.response?.status !== undefined && error?.response?.data?.message !== undefined) {
+            return rejectWithValue({
+                status: error.response.status,
+                message: error.response.data.message
+            });
+        } else {
+            throw error;
+        }
+    }
+});
+
+
 export const productsSlice = createSlice({
     name: 'products',
     initialState: {
@@ -72,6 +105,8 @@ export const productsSlice = createSlice({
         all: [],
         allByCommunity: {},
         allByCommunityRequestMetadata: {},
+        allWithRatingsByCommunity: {},
+        allWithRatingsByCommunityRequestMetadata: {},
         errors: [],
         validSession: true
     },
@@ -138,6 +173,44 @@ export const productsSlice = createSlice({
                     default:
                         state.errors = [action.payload?.message || action.error.message]
                 }
+            })
+            .addCase(listMoreProductsWithRatings.pending, (state, action) => {
+                const communityId = action.meta.arg.communityId;
+                let requestMetadata = state.allWithRatingsByCommunityRequestMetadata[communityId] || {};
+                requestMetadata.status = 'loading';
+                state.allWithRatingsByCommunityRequestMetadata[communityId] = requestMetadata;
+                state.errors = [];
+            })
+            .addCase(listMoreProductsWithRatings.fulfilled, (state, action) => {
+                const communityId = action.payload.communityFilter;
+                const requestMetadata = {
+                    status: 'succeeded',
+                    next: action.payload.next,
+                };
+                state.allWithRatingsByCommunityRequestMetadata[communityId] = requestMetadata;
+
+                let currentProducts = state.allWithRatingsByCommunity[communityId];
+                if (currentProducts === undefined) {
+                    currentProducts = [];
+                }
+                state.allWithRatingsByCommunity[communityId] = currentProducts.concat(action.payload.products);
+            })
+            .addCase(listMoreProductsWithRatings.rejected, (state, action) => {
+                const communityId = action.meta.arg.communityId;
+                let requestMetadata = state.allWithRatingsByCommunity[communityId];
+                requestMetadata.status = 'failed'
+                switch(action.payload?.status) {
+                    case 401:
+                        console.log("expiredAuth")
+                        requestMetadata.status = 'expiredAuth'
+                        break;
+                    default:
+                        console.log("error")
+                        console.log(action.payload)
+                        console.log(action.error)
+                        state.errors = [action.payload?.message || action.error.message]
+                }
+                state.allWithRatingsByCommunity[communityId] = requestMetadata;
             })
     }
 });

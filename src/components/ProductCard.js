@@ -3,12 +3,35 @@ import { Text, View, StyleSheet, Pressable, Image } from "react-native";
 import Field from "../components/Field";
 import FieldSet from "../components/FieldSet";
 
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faStar } from '@fortawesome/free-solid-svg-icons/faStar'
+
 const ProductCard = ({ product, fields, navigation }) => {
     const navigateToProductPage = () => {
         navigation.navigate('Product Home', {
             productId: product.id,
             communityId: product.community_id
         });
+    }
+
+    const renderRating = () => {
+        if (product.rating !== undefined) {
+            return (
+                <View style={[ styles.headerWrapper, { marginBottom: 5}]}>
+                    <FontAwesomeIcon
+                        style={{ transform: [{translateY: 2 }] }}
+                        color={ "black" } size={ 18 }
+                        icon={ faStar } />
+                    <Text
+                        accessibilityLabel="Your Rating"
+                        accessibilityRole="text"
+                        style={[ styles.text, styles.ratingText ]}
+                    >
+                        { Number(product.rating.rating).toFixed(1) }
+                    </Text>
+                </View>
+            )
+        }
     }
 
     return (
@@ -32,6 +55,7 @@ const ProductCard = ({ product, fields, navigation }) => {
                 onPress={ navigateToProductPage }
                 style={ styles.content }
             >
+                { renderRating() }
                 <View
                     style={ styles.headerWrapper }>
                     <Text style={[ styles.text, styles.brandText ]} numberOfLines={1}>{ product.brand }</Text>
@@ -77,6 +101,9 @@ const styles = StyleSheet.create({
     },
     headerText: {
         flex: 1,
+    },
+    ratingText: {
+        marginLeft: 5,
     },
     content: {
        width: "100%",

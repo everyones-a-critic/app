@@ -14,6 +14,8 @@ import { Provider } from 'react-redux';
 import communitiesReducer from "../features/communities/communitiesSlice";
 import productsReducer from "../features/products/productsSlice";
 import accountReducer from "../features/account/accountSlice";
+import ratingsReducer from "../features/ratings/ratingsSlice";
+
 import { mockReturnValues } from '../../testing/apiMockResources';
 import { mockStore } from '../../testing/secureStoreMockResources';
 
@@ -31,6 +33,7 @@ beforeEach(() => {
             communities: communitiesReducer,
             products: productsReducer,
             account: accountReducer,
+            ratings: ratingsReducer,
         }
     });
 
