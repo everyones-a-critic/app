@@ -175,7 +175,8 @@ class CommunityEnrollment extends React.Component {
                     accessibilityRole={ actionType === 'enter' ? 'link' : 'button' }
                     accessibilityHint={ actionType === 'enter' ? `Tap to open the ${community.display_name} page` : `Tap to join the ${community.display_name} community` }
                     style={ style }
-                    hidden={ actionType === 'enter' ? deleted : null }/>
+                    hidden={ actionType === 'enter' ? deleted : null }
+                    navigation={ this.props.navigation }/>
             )
 
             if (swipeFunction !== undefined) {

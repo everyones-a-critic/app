@@ -29,8 +29,8 @@ const renderActionIcon = type => {
     }
 }
 
-let isMounted;
-const CommunityListItem = ({ community, style, action, actionType, hidden, accessibilityRole, accessibilityHint }) => {
+const CommunityListItem = ({ community, style, action, actionType, hidden, accessibilityRole, accessibilityHint, navigation }) => {
+    const [isMounted, setIsMounted ] = useState(false);
     const [disabled, setDisabled ] = useState(false);
 
     const onPress = async () => {
@@ -42,10 +42,14 @@ const CommunityListItem = ({ community, style, action, actionType, hidden, acces
     }
 
     useEffect(() => {
-        isMounted = true;
+        setIsMounted(true);
+
+        navigation.addListener('blur', () => {
+            setIsMounted(false);
+        });
 
         return () => {
-            isMounted = false;
+            setIsMounted(false);
         };
     }, []);
 

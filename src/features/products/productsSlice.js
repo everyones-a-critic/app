@@ -44,6 +44,7 @@ export const listMoreProducts = createAsyncThunk('products/list', async (data, {
     }
 
     try {
+        console.log("Called with this url: ", url)
         const response = await api.get(url)
         return {
             products: response.data.results,
