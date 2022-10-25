@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "EveryonesACritic",
+    "name": "Everyone's a Critic",
     "slug": "EveryonesACritic",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.everyonesacriticapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +27,11 @@
     },
     "web": {
       "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "829b5e48-10fc-4205-a95b-9bbe24f6dbda"
+      }
     }
   }
 }
