@@ -1,4 +1,6 @@
 import { render, fireEvent, waitFor, cleanup } from '@testing-library/react-native';
+import TestRenderer from 'react-test-renderer';
+const { act } = TestRenderer;
 // import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 // import { State } from 'react-native-gesture-handler';
 import axios from 'axios';
@@ -59,15 +61,37 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
-test('When user is a community member, enrolled section and enrolled communities are rendered ', async() => {
+jest.useFakeTimers({doNotFake: [
+    'setImmediate',
+    'setInterval',
+    'cancelAnimationFrame',
+    'cancelIdleCallback',
+    'clearImmediate',
+    'clearInterval',
+    'nextTick',
+    'queueMicrotask',
+]});
+
+const renderCommunityEnrollmentView = async () => {
     let screen;
     await waitFor(() => {
         screen = render(
             <Provider store={store}>
-                <CommunityEnrollment/>
+                <NavigationContainer>
+                    <Stack.Navigator>
+                        <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
+                        <Stack.Screen name="Community Home" component={ CommunityHome } options={{ headerShown: false }} />
+                        <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
+                    </Stack.Navigator>
+                </NavigationContainer>
             </Provider>
         );
     });
+    return screen;
+}
+
+test('When user is a community member, enrolled section and enrolled communities are rendered ', async() => {
+    const screen = await renderCommunityEnrollmentView();
 
     expect(screen.getByText('Your Communities')).toBeTruthy()
     expect(screen.getByAccessibilityHint('Tap to open the 3 page')).toHaveTextContent("3");
@@ -75,7 +99,7 @@ test('When user is a community member, enrolled section and enrolled communities
     expect(() => screen.getByAccessibilityHint('Tap to join the 3 community')).toThrow('Unable to find an element');
 });
 
-test('When not a community member, enrolled section is not rendered', async () => {
+test('When not a community member, message is displayed', async () => {
     const overrides = {
         '/communities?isMember=true&page=1': {
             "isBase64Encoded": true,
@@ -96,59 +120,29 @@ test('When not a community member, enrolled section is not rendered', async () =
         return returnValuesCopy[url];
     });
 
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <CommunityEnrollment/>
-            </Provider>
-        );
-    });
+    const screen = await renderCommunityEnrollmentView();
 
-    expect(() => screen.getByText('Your Communities')).toThrow('Unable to find an element');
+    expect(screen.getByText("You haven't joined any communities yet. Join some below.")).toBeTruthy()
 });
 
-test('All communities section is rendered and more render on scroll', async () => {
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <CommunityEnrollment/>
-            </Provider>
-        );
+test('All communities section is rendered', async () => {
+    const screen = await renderCommunityEnrollmentView();
 
-        expect(screen.getByAccessibilityHint('Tap to join the 1 community')).toHaveTextContent("1");
-        expect(screen.getByAccessibilityHint('Tap to join the 25 community')).toHaveTextContent("25");
-
-        const scrollView = screen.getByAccessibilityHint('Scroll to see more communities to join.')
-        fireEvent(scrollView, 'scrollEndDrag', {
-            nativeEvent: {
-                contentSize: { height: 1500 },
-                layoutMeasurement: { height: 400 },
-                contentOffset: { y: 800 }
-            }
-        });
-    });
-
-    expect(screen.getByAccessibilityHint('Tap to join the 26 community')).toHaveTextContent("26");
+    expect(screen.getByAccessibilityHint('Tap to join the 1 community')).toHaveTextContent("1");
+    expect(screen.getByAccessibilityHint('Tap to join the 8 community')).toHaveTextContent("8");
 });
 
 test('On search, trending results disappear and search results appear', async () => {
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <CommunityEnrollment/>
-            </Provider>
-        );
+    const screen = await renderCommunityEnrollmentView();
 
-        // before search
-        expect(screen.getByText('Trending')).toBeTruthy();
-        expect(screen.getByAccessibilityHint('Tap to join the 1 community')).toHaveTextContent("1");
+    // before search
+    expect(screen.getByText('Trending')).toBeTruthy();
+    expect(screen.getByAccessibilityHint('Tap to join the 1 community')).toHaveTextContent("1");
 
+    await act(async() => {
         // do search
-        fireEvent.changeText(screen.getByRole('search'), 'test')
-        fireEvent(screen.getByRole('search'), 'submitEditing')
+        await fireEvent.changeText(screen.getByRole('search'), 'test')
+        await fireEvent(screen.getByRole('search'), 'submitEditing')
     });
 
     // after search
@@ -159,13 +153,9 @@ test('On search, trending results disappear and search results appear', async ()
 });
 
 test('On press of available community, join command is sent and community moves to enrolled section', async () => {
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <CommunityEnrollment/>
-            </Provider>
-        );
+    const screen = await renderCommunityEnrollmentView();
+
+    await act(async() => {
         fireEvent(screen.getByAccessibilityHint('Tap to join the 1 community'), 'press');
     });
 
@@ -206,20 +196,15 @@ test('On press of available community, join command is sent and community moves 
 // });
 
 test('On press enrolled community, navigate to ', async () => {
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <NavigationContainer>
-                    <Stack.Navigator>
-                        <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
-                        <Stack.Screen name="Community Home" component={ CommunityHome } options={{ headerShown: false }} />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            </Provider>
-        );
+    const screen = await renderCommunityEnrollmentView();
+    await act(async() => {
         fireEvent(screen.getByAccessibilityHint('Tap to open the 3 page'), 'press');
     });
+    await act(async() => {
+        // .25 second for action to be performed
+        await jest.advanceTimersByTime(250);
+    });
+
     const headerElements = screen.getAllByRole('header')
     expect(headerElements[0]).toHaveTextContent('3');
 });
@@ -241,14 +226,8 @@ describe('Error modal renders', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <CommunityEnrollment/>
-                </Provider>
-            );
-        });
+        const screen = await renderCommunityEnrollmentView();
+
         expect(screen.getByRole('alert')).toHaveTextContent(
             "Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"
         );
@@ -270,14 +249,7 @@ describe('Error modal renders', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <CommunityEnrollment/>
-                </Provider>
-            );
-        });
+        const screen = await renderCommunityEnrollmentView();
 
         expect(screen.getByRole('alert')).toHaveTextContent(
             "Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"
@@ -300,16 +272,9 @@ describe('Error modal renders', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <CommunityEnrollment/>
-                </Provider>
-            );
-            fireEvent.changeText(screen.getByRole('search'), 'test')
-            fireEvent(screen.getByRole('search'), 'submitEditing')
-        });
+        const screen = await renderCommunityEnrollmentView();
+        await act(async() => fireEvent.changeText(screen.getByRole('search'), 'test'));
+        await act(async() => fireEvent(screen.getByRole('search'), 'submitEditing'));
 
         expect(screen.getByRole('alert')).toHaveTextContent(
             "Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"
@@ -327,13 +292,9 @@ describe('Error modal renders', () => {
             return Promise.reject(rejectValue)
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <CommunityEnrollment/>
-                </Provider>
-            );
+        const screen = await renderCommunityEnrollmentView();
+
+        await act(async() => {
             fireEvent(screen.getByAccessibilityHint('Tap to join the 1 community'), 'press');
         });
 
@@ -364,19 +325,7 @@ describe('User is routed to login page', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
-                            <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                </Provider>
-            );
-        });
+        const screen = await renderCommunityEnrollmentView();
 
         expect(screen.getByText("Your session has expired, please sign in again.")).toBeTruthy()
     });
@@ -397,19 +346,7 @@ describe('User is routed to login page', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
-                            <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                </Provider>
-            );
-        });
+        const screen = await renderCommunityEnrollmentView();
 
         expect(screen.getByText("Your session has expired, please sign in again.")).toBeTruthy()
     });
@@ -430,22 +367,9 @@ describe('User is routed to login page', () => {
             return returnValuesCopy[url];
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
-                            <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                </Provider>
-            );
-
-            fireEvent.changeText(screen.getByRole('search'), 'test')
-            fireEvent(screen.getByRole('search'), 'submitEditing')
-        });
+        const screen = await renderCommunityEnrollmentView();
+        await act(async() => fireEvent.changeText(screen.getByRole('search'), 'test'));
+        await act(async() => fireEvent(screen.getByRole('search'), 'submitEditing'));
 
         expect(screen.getByText("Your session has expired, please sign in again.")).toBeTruthy();
     });
@@ -461,23 +385,10 @@ describe('User is routed to login page', () => {
             return Promise.reject(rejectValue)
         });
 
-        let screen;
-        await waitFor(() => {
-            screen = render(
-                <Provider store={store}>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                            <Stack.Screen name="Community Enrollment" component={ CommunityEnrollment } options={{ headerShown: false }} />
-                            <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                </Provider>
-            );
-            fireEvent(screen.getByAccessibilityHint('Tap to join the 1 community'), 'press');
-        });
+        const screen = await renderCommunityEnrollmentView();
+        await act(async() => fireEvent(screen.getByAccessibilityHint('Tap to join the 1 community'), 'press'));
 
         expect(screen.getByText("Your session has expired, please sign in again.")).toBeTruthy();
     });
 
-//     test('upon join error', async () => {}
 });

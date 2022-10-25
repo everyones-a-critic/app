@@ -23,10 +23,10 @@ const CommunityHome = (props) => {
     const [selectedProductList, setSelectedProductList] = useState("Browse")
 
     const getMoreProducts = () => {
-        if (!props.productsLoading && communityId != null) {
-            if (selectedProductList === "Browse") {
+        if (communityId != null) {
+            if (selectedProductList === "Browse" && !props.allProductsLoading ) {
                 props.listMoreProducts({ communityId: communityId })
-            } else {
+            } else if (selectedProductList === "Your Reviews"  && !props.productsWithRatingsLoading) {
                 props.listMoreProductsWithRatings({ communityId: communityId })
             }
         }
@@ -103,21 +103,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
     const communityId = state.communities.focusedCommunity?.id;
-    const checkForLoadingProductsRequests = () => {
-        const allProductsLoading = Object.keys(state.products.allByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allByCommunityRequestMetadata[key]?.status === 'loading') {
-                return true;
-            }
-        })
-
-        const productsWithRatingsLoading = Object.keys(state.products.allWithRatingsByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allWithRatingsByCommunityRequestMetadata[key]?.status === 'loading') {
-                return true;
-            }
-        })
-
-        return allProductsLoading || productsWithRatingsLoading || false;
+    const getAllProductsLoading = () => {
+        return state.products.allByCommunityRequestMetadata[communityId]?.status === 'loading';
     };
+
+    const getProductsWithRatingsLoading = () => {
+        return state.products.allWithRatingsByCommunityRequestMetadata[communityId]?.status === 'loading';
+    }
 
     const checkForExpiredAuth = () => {
         const productAuthExpired = Object.keys(state.products.allByCommunityRequestMetadata).forEach(key => {
@@ -157,9 +149,10 @@ const mapStateToProps = state => {
 
     return {
         community: state.communities.focusedCommunity,
-        productsLoading: checkForLoadingProductsRequests(),
+        allProductsLoading: getAllProductsLoading(),
         allProducts: state.products.allByCommunity[communityId],
         productsWithRatings: state.products.allWithRatingsByCommunity[communityId],
+        productsWithRatingsLoading: getProductsWithRatingsLoading(),
         authExpired: checkForExpiredAuth(),
         errors: checkForErrors(),
     }
