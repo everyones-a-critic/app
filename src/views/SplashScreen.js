@@ -104,7 +104,7 @@ const SplashScreen = props => {
         if (token !== undefined) {
             setHasEverLoggedIn(true);
             const communityId = await getItemAsync('MostRecentCommunityId');
-            if (communityId !== undefined) {
+            if (communityId !== undefined && communityId !== null) {
                 props.getCommunity({ id: communityId });
             }
         }
