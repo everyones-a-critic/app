@@ -206,6 +206,8 @@ export const communitiesSlice = createSlice({
                 });
             })
             .addCase(listMoreCommunities.rejected, (state, action) => {
+                console.log("listMoreCommunities.rejected:")
+                console.log(action.payload?.message || action.error.message)
                 state.allCommunitiesRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
@@ -225,6 +227,8 @@ export const communitiesSlice = createSlice({
                 state.enrolled = state.enrolled.concat(action.payload.communities);
             })
             .addCase(listMoreEnrolledCommunities.rejected, (state, action) => {
+                console.log("listMoreEnrolledCommunities.rejected:")
+                console.log(action.payload?.message || action.error.message)
                 state.enrolledCommunitiesRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
@@ -241,8 +245,9 @@ export const communitiesSlice = createSlice({
                 state.enrolled.push(action.payload.community)
             })
             .addCase(joinCommunity.rejected, (state, action) => {
+                console.log("joinCommunity.rejected:")
+                console.log(action.payload?.message || action.error.message)
                 state.joinRequestMetadata.status = 'failed';
-                console.log(action.payload)
                 switch(action.payload?.status) {
                     case 401:
                         state.joinRequestMetadata.status = 'expiredAuth';
@@ -261,6 +266,8 @@ export const communitiesSlice = createSlice({
                 state.enrolled = state.enrolled.filter(community => community.id !== action.payload.community.id);
             })
             .addCase(leaveCommunity.rejected, (state, action) => {
+                console.log('leaveCommunity.rejected');
+                console.log(action.payload?.message || action.error.message)
                 state.leaveRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
@@ -279,6 +286,8 @@ export const communitiesSlice = createSlice({
                 state.searchResults = action.payload.communities;
             })
             .addCase(searchCommunities.rejected, (state, action) => {
+                console.log('searchCommunities.rejected')
+                console.log(action.payload?.message || action.error.message)
                 state.searchRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
@@ -301,9 +310,8 @@ export const communitiesSlice = createSlice({
                 state.errors = [];
             })
             .addCase(getCommunity.rejected, (state, action) => {
-                console.log("error:")
-                console.log(action.error)
-                console.log(action.payload)
+                console.log("getCommunity.rejected:")
+                console.log(action.payload?.message || action.error.message)
                 state.getOneRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
