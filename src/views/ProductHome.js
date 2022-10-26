@@ -144,7 +144,7 @@ const ProductHome = (props) => {
         >
             <ScrollView
                 scrollEnabled={ scrollEnabled }
-                contentContainerStyle= {{ paddingBottom: 90 }}
+                contentContainerStyle= {{ paddingBottom: 90, minHeight: 950 }}
                 ref={ scrollComponent }
             >
                 { renderProductInfo() }

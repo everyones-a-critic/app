@@ -3,19 +3,23 @@ import { Text, View, StyleSheet } from 'react-native';
 const Field = ({ data, fieldMetadata, fallbackLabel, style }) => {
     const formatValue = (item, metadata) => {
         let enhancedValue = item[metadata.name];
-        if (Array.isArray(enhancedValue)) {
-            let formattedString = "";
-            enhancedValue.forEach(i => {
-                const formattedValue = formatValue({[metadata.name] : i}, metadata);
-                formattedString += `${formattedValue}, `;
-            });
-            enhancedValue = formattedString.slice(0, -2);
-        } else {
-            if (metadata.formatting === 'currency') {
-                const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-                enhancedValue = formatter.format(enhancedValue);
-                if (item.price_per) {
-                    enhancedValue += ` for ${item.price_per}`;
+        if (enhancedValue !== null & enhancedValue !== undefined) {
+            if (Array.isArray(enhancedValue)) {
+                let formattedString = "";
+                enhancedValue.forEach(i => {
+                    const formattedValue = formatValue({[metadata.name] : i}, metadata);
+                    formattedString += `${formattedValue}, `;
+                });
+                enhancedValue = formattedString.slice(0, -2);
+            } else {
+                if (metadata.formatting === 'currency') {
+                    const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+                    enhancedValue = formatter.format(enhancedValue);
+                    if (item.price_per) {
+                        enhancedValue += ` for ${item.price_per}`;
+                    }
+                } else if (metadata.formatting === 'percentage') {
+                    enhancedValue = `${enhancedValue * 100}%`;
                 }
             }
         }
