@@ -13,7 +13,6 @@ export default ({ errors }) => {
 
     const renderErrorText = () => {
         if (errors.length === 1) {
-            console.log('Here')
             return <Text accessibilityRole="alert" style={[ styles.text, styles.errorText ]}>{ errors[0] }</Text>
         } else {
             let i = 0;
