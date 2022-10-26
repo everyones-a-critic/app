@@ -16,3 +16,4 @@ web-build/
 
 # Non Default
 .env
+.env.*
