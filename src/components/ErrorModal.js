@@ -6,12 +6,14 @@ export default ({ errors }) => {
 
     useEffect(() => {
 		if (errors !== undefined && errors.length > 0) {
+		    console.log("Error modal triggered")
             setVisible(true);
         }
     }, [errors]);
 
     const renderErrorText = () => {
         if (errors.length === 1) {
+            console.log('Here')
             return <Text accessibilityRole="alert" style={[ styles.text, styles.errorText ]}>{ errors[0] }</Text>
         } else {
             let i = 0;

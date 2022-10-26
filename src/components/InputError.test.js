@@ -1,6 +1,4 @@
 import { render, screen } from '@testing-library/react-native';
-import { toHaveTextContent } from '@testing-library/jest-native';
-expect.extend({ toHaveTextContent });
 
 import InputError from "./InputError";
 

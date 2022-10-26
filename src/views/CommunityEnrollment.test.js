@@ -228,7 +228,12 @@ describe('Error modal renders', () => {
 
         const screen = await renderCommunityEnrollmentView();
 
-        expect(screen.getByRole('alert')).toHaveTextContent(
+        let alertElement;
+        await act(async() => {
+            alertElement = await screen.findByRole('alert')
+        });
+
+        expect(alertElement).toHaveTextContent(
             "Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"
         );
     });
