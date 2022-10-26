@@ -6,7 +6,6 @@ export default ({ errors }) => {
 
     useEffect(() => {
 		if (errors !== undefined && errors.length > 0) {
-		    console.log("Error modal triggered")
             setVisible(true);
         }
     }, [errors]);
