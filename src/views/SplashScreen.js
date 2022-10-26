@@ -167,13 +167,13 @@ const SplashScreen = props => {
                     <IcomoonIcon size={150} name="icon"/>
                 </Animated.Text>
             )
-        } else {
+        } else if (props.community !== null && props.community !== undefined) {
             return (
                 <Animated.Text style={[ styles.categoryIcon, { opacity: secondaryHeaderOpacity }]}>
                     <FontAwesomeIcon
                         color={`#${props.community?.secondary_color}`}
                         size={150}
-                        icon={ findIconDefinition({prefix: 'fas', iconName: props.community.icon }) } />
+                        icon={ findIconDefinition({prefix: 'fas', iconName: props.community?.icon }) } />
                 </Animated.Text>
             )
         }
