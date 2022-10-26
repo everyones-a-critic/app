@@ -19,38 +19,44 @@ const EditRating = props => {
     useEffect(() => {
         if (props.rating !== undefined && props.rating !== null) {
             setAdjustment(Math.round((props.rating.rating - props.rating.roundedRating) * 100) / 100);
+            setComments(props.rating.comments);
         }
     }, [props.rating?.rating]);
 
-    // using two useEffects to debounce the api
     useEffect(() => {
-        if ((adjustment !== null || comments !== null) && props.rating !== undefined && props.rating !== null) {
+        if (props.rating !== undefined && props.rating !== null && adjustment != null) {
+            const rating = Math.round((props.rating.roundedRating + adjustment) * 100) / 100;
+            if (rating !== props.rating.rating) {
+                props.updateRating({
+                    productId: props.focusedProductId,
+                    ratingId: props.rating.id,
+                    data: { rating }
+                });
+            }
+        }
+    }, [adjustment]);
+
+    // using two useEffects to debounce the api for comments patch
+    useEffect(() => {
+        if (comments !== null && comments !== '' && props.rating !== undefined && props.rating !== null) {
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
-                let ratingData = {
-                    rating: Math.round((props.rating.roundedRating + adjustment) * 100) / 100,
-                };
-
                 if (comments !== '' && comments !== null) {
-                    ratingData.comments = comments;
+                    const patchData = { comments: comments };
+                    setPatchData(patchData);
                 }
-
-                setPatchData(ratingData);
             }, 500);
         }
 
         return () => {
             window.clearTimeout(timer);
         }
-    }, [adjustment, comments]);
+    }, [comments]);
 
     useEffect(() => {
         if (
             patchData !== null && props.rating !== undefined && props.rating !== null &&
-            (
-                (patchData?.rating !== undefined && patchData?.rating !== props.rating.rating) ||
-                (patchData?.comments !== undefined && patchData?.comments !== props.rating.comments)
-            ) &&
+            patchData?.comments !== undefined && patchData?.comments !== props.rating.comments &&
             props.requestStatus !== 'loading'
         ) {
             props.updateRating({
@@ -59,7 +65,7 @@ const EditRating = props => {
                 data: patchData,
             });
         }
-    }, [patchData?.rating, patchData?.comments, props.requestStatus]);
+    }, [patchData, props.requestStatus]);
 
     return (
         <View style={{ flex: 1 }}>
@@ -101,6 +107,7 @@ const EditRating = props => {
                         accessibilityLabel="Comments"
                         accessibilityHint="Enter any notes or thoughts here."
                         onFocus={ () => props.bottomSheetRef.current.snapToIndex(1) }
+                        value={ comments }
                         onChangeText={ text => setComments(text) }
                         style={ styles.textArea } multiline={ true } />
                 </ScrollView>

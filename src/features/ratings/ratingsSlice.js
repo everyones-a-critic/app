@@ -40,7 +40,6 @@ export const getMostRecentRating = createAsyncThunk('ratings/getMostRecent', asy
 export const createOrUpdateRating = createAsyncThunk('ratings/createOrUpdate', async ({ rating, comments, productId }, { getState, rejectWithValue }) => {
     // logic implemented on the API side. if over 24 hours old, creates a new one, otherwise updates. This allows us to
     // track history and see how a user's tastes are changing over time
-
     try {
         const post_data = { rating };
         if (comments !== undefined) {
@@ -126,7 +125,7 @@ export const ratingsSlice = createSlice({
                 const productId = action.meta.arg.productId;
                 state.requestMetadata[productId].status = 'succeeded';
                 state.mostRecentRatings[productId] = action.payload.rating;
-                state.errors[action.payload.productId] = [];
+                state.errors[productId] = [];
             })
             .addCase(getMostRecentRating.rejected, (state, action) => {
                 console.log('getMostRecentRating.rejected: ')
@@ -158,7 +157,7 @@ export const ratingsSlice = createSlice({
                 const productId = action.meta.arg.productId;
                 state.requestMetadata[productId].status = 'succeeded';
                 state.mostRecentRatings[productId] = action.payload.rating;
-                state.errors[action.payload.productId] = [];
+                state.errors[productId] = [];
             })
             .addCase(createOrUpdateRating.rejected, (state, action) => {
                 console.log('createOrUpdateRating.rejected: ')
@@ -191,7 +190,7 @@ export const ratingsSlice = createSlice({
                 const productId = action.meta.arg.productId;
                 state.requestMetadata[productId].status = 'succeeded';
                 delete state.mostRecentRatings[productId];
-                state.errors[action.payload.productId] = [];
+                state.errors[productId] = [];
             })
             .addCase(archiveRating.rejected, (state, action) => {
                 console.log('archiveRating.rejected: ')
@@ -223,7 +222,7 @@ export const ratingsSlice = createSlice({
                 const productId = action.meta.arg.productId;
                 state.requestMetadata[productId].status = 'succeeded';
                 state.mostRecentRatings[productId] = action.payload.rating;
-                state.errors[action.payload.productId] = [];
+                state.errors[productId] = [];
             })
             .addCase(updateRating.rejected, (state, action) => {
                 console.log('updateRating.rejected: ')
