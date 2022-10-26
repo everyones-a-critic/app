@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { COGNITO_CLIENT_ID, COGNITO_REGION, COGNITO_USER_POOL_ID } from "react-native-dotenv";
 import {
     CognitoIdentityProviderClient,
     SignUpCommand,
@@ -13,8 +12,8 @@ import { setItemAsync } from 'expo-secure-store';
 export const signUp = createAsyncThunk('account/signUp', async formData => {
     const email = formData.email.trim();
     const input = {
-        ClientId: COGNITO_CLIENT_ID,
-        UserPoolId: COGNITO_USER_POOL_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
         // Password: formData.password,
         Password: "Test1234%",
         Username: email,
@@ -24,7 +23,7 @@ export const signUp = createAsyncThunk('account/signUp', async formData => {
     };
 
     const client = new CognitoIdentityProviderClient({
-        region: COGNITO_REGION,
+        region: process.env.COGNITO_REGION,
     });
 
     const command = new SignUpCommand(input);
@@ -57,14 +56,14 @@ export const signUp = createAsyncThunk('account/signUp', async formData => {
 export const confirm = createAsyncThunk('account/confirm', async formData => {
     const email = formData.email.trim();
     const input = {
-        ClientId: COGNITO_CLIENT_ID,
-        UserPoolId: COGNITO_USER_POOL_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
         Username: email,
         ConfirmationCode: formData.confirmationCode,
     };
 
     const client = new CognitoIdentityProviderClient({
-        region: COGNITO_REGION,
+        region: process.env.COGNITO_REGION,
     });
 
     const command = new ConfirmSignUpCommand(input);
@@ -86,8 +85,8 @@ export const confirm = createAsyncThunk('account/confirm', async formData => {
 export const signIn = createAsyncThunk('account/signIn', async formData => {
     const email = formData.email.trim()
     const input = {
-        ClientId: COGNITO_CLIENT_ID,
-        UserPoolId: COGNITO_USER_POOL_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
         AuthFlow: "USER_PASSWORD_AUTH",
         AuthParameters: {
             USERNAME: email,
@@ -96,7 +95,7 @@ export const signIn = createAsyncThunk('account/signIn', async formData => {
     }
 
     const client = new CognitoIdentityProviderClient({
-        region: COGNITO_REGION,
+        region: process.env.COGNITO_REGION,
     });
     const command = new InitiateAuthCommand(input);
     const response = await client.send(command);
@@ -133,13 +132,13 @@ export const signIn = createAsyncThunk('account/signIn', async formData => {
 
 export const sendConfirmationCode = createAsyncThunk('account/sendConfirmationCode', async formData => {
     const input = {
-        ClientId: COGNITO_CLIENT_ID,
-        UserPoolId: COGNITO_USER_POOL_ID,
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
         Username: formData.email
     }
 
     const client = new CognitoIdentityProviderClient({
-        region: COGNITO_REGION,
+        region: process.env.COGNITO_REGION,
     });
 
     const command = new ResendConfirmationCodeCommand(input);

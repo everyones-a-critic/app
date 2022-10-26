@@ -4,12 +4,8 @@ module.exports = function(api) {
     presets: ['babel-preset-expo'],
     plugins: [
       'macros',
-      [
-        "module:react-native-dotenv",
-        {
-          moduleName: "react-native-dotenv",
-        },
-      ],
+      'transform-inline-environment-variables',
+      ["module:react-native-dotenv"],
       'react-native-reanimated/plugin',
     ],
   };
