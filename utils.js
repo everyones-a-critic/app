@@ -39,3 +39,16 @@ export const hexToRGB = hexColor => {
 
     return `rgb(${r},${g},${b})`;
 };
+
+export const rgbToHex = rgbString => {
+    console.log(rgbString)
+    const components = rgbString.replace('rgb(', '').replace(')', '').split(',')
+    const r = parseInt(components[0])
+    const g = parseInt(components[1])
+    const b = parseInt(components[2])
+    return `#${[r, g, b]
+        .map((n) =>
+            n.toString(16).length === 1 ? "0" + n.toString(16) : n.toString(16)
+        )
+    .join("")}`;
+};

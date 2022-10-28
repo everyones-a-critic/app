@@ -79,7 +79,7 @@ const CommunityHeader = props => {
     return (
         <React.Fragment>
             <View style={{ height: insets.top, backgroundColor: primaryColor }}>
-                <StatusBar backgroundColor={ primaryColor } barStyle={ pickBarStyle(primaryColor) } />
+                <StatusBar hidden={ false } backgroundColor={ primaryColor } barStyle={ pickBarStyle(primaryColor) } />
             </View>
             <View style={[ styles.header, { backgroundColor: primaryColor }]}>
                 { renderHeader() }

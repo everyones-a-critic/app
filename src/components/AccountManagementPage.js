@@ -5,8 +5,9 @@ setupURLPolyfill();
 import React from 'react';
 import {
     StyleSheet, KeyboardAvoidingView, ScrollView, View, Pressable, Text, Image, Keyboard, Platform,
-    Dimensions
+    Dimensions, StatusBar
 } from 'react-native';
+import { SafeAreaProvider, SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import {resetErrors, signUp} from "../features/account/accountSlice";
 import Loader from '../components/Loader';
@@ -116,44 +117,51 @@ class AccountManagementPage extends React.Component {
 
     render() {
         return (
-            <Loader loading={ this.state.webRequestInProgress }>
-                <KeyboardAvoidingView
-                    behavior={ Platform.OS === "ios" ? "padding" : "height" }
-                    style={{ flex: 1 }}
-                >
-                    <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={[
-                        styles.container,
-                        { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - 10 }
-                    ]}>
-                        <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />
-                        <View style={[
-                            styles.flexbox,
-                            { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}
-                        ]}>
-                            { this.props.children }
-                            { this.renderFormErrors() }
-                        </View>
-                        <View style={[styles.flexbox, { flexBasis: 120, flexShrink: 4, flexGrow: 4 }]}>
-                            <Pressable
-                                disabled={this.state.submitDisabled}
-                                accessibilityRole="button"
-                                accessibilityState={{
-                                    disabled: this.state.submitDisabled,
-                                    busy: this.state.submitDisabled
-                                }}
-                                accessibilityLabel={`Submit ${this.props.formName} Form`}
-                                style={{ width: "80%", marginTop: 25 }}
-                                onPress={(e) => this.onSubmit(e) }
-                            >
-                                <View style={styles.button}>
-                                    <Text style={styles.buttonText}>{this.props.submitButtonText}</Text>
+            <SafeAreaProvider>
+                <SafeAreaInsetsContext.Consumer>
+                    { insets => <Loader loading={ this.state.webRequestInProgress }>
+                        <KeyboardAvoidingView
+                            behavior={ Platform.OS === "ios" ? "padding" : "height" }
+                            style={{ flex: 1 }}
+                        >
+                            <View style={{ height: insets.top, backgroundColor: YELLOW }}>
+                                <StatusBar hidden={false} backgroundColor={ YELLOW } barStyle={ 'light-content' } />
+                            </View>
+                            <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={[
+                                styles.container,
+                                { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - insets.top }
+                            ]}>
+                                <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />
+                                <View style={[
+                                    styles.flexbox,
+                                    { minHeight: 200, flexShrink: 0, flexGrow: 1, justifyContent: 'space-evenly'}
+                                ]}>
+                                    { this.props.children }
+                                    { this.renderFormErrors() }
                                 </View>
-                            </Pressable>
-                            { this.renderNavigationLink() }
-                        </View>
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </Loader>
+                                <View style={[styles.flexbox, { flexBasis: 120, flexShrink: 4, flexGrow: 4 }]}>
+                                    <Pressable
+                                        disabled={this.state.submitDisabled}
+                                        accessibilityRole="button"
+                                        accessibilityState={{
+                                            disabled: this.state.submitDisabled,
+                                            busy: this.state.submitDisabled
+                                        }}
+                                        accessibilityLabel={`Submit ${this.props.formName} Form`}
+                                        style={{ width: "80%", marginTop: 25 }}
+                                        onPress={(e) => this.onSubmit(e) }
+                                    >
+                                        <View style={styles.button}>
+                                            <Text style={styles.buttonText}>{this.props.submitButtonText}</Text>
+                                        </View>
+                                    </Pressable>
+                                    { this.renderNavigationLink() }
+                                </View>
+                            </ScrollView>
+                        </KeyboardAvoidingView>
+                    </Loader> }
+                </SafeAreaInsetsContext.Consumer>
+            </SafeAreaProvider>
         );
     }
 }

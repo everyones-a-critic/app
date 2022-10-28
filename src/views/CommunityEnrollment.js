@@ -121,15 +121,23 @@ class CommunityEnrollment extends React.Component {
         }
     }
 
+    renderStatusBar = (insets) => {
+        if (!this.props.renderAsBottomSheet) {
+            return (
+                <View style={{ height: insets.top, backgroundColor: YELLOW }}>
+                    <StatusBar backgroundColor={ YELLOW } barStyle={ 'light-content' } />
+                </View>
+            )
+        }
+    }
+
     render = () => {
         return (
             <AuthenticationProvider authExpired={ this.props.authExpired } navigation={ this.props.navigation }>
                 <SafeAreaProvider>
                     <SafeAreaInsetsContext.Consumer>
                         { insets => <View style= {{ flex: 1 }}>
-                            <View style={{ height: insets.top, backgroundColor: YELLOW }}>
-                                <StatusBar backgroundColor={ YELLOW } barStyle={ 'dark-content' } />
-                            </View>
+                            { this.renderStatusBar(insets) }
                             <View style={ styles.foreground }>
                                 <View style={[ styles.header, this.props.renderAsBottomSheet ? styles.bottomSheetHeader : {} ]}>
                                     <Text style={ styles.headerText }>Communities</Text>

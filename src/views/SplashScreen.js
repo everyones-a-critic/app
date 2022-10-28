@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from "react-redux";
-import { StyleSheet, Animated, Image, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Animated, Image, View, Text, TouchableWithoutFeedback, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setItemAsync, getItemAsync } from 'expo-secure-store';
 
 
@@ -17,10 +18,12 @@ import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 import { restartSession } from "../features/account/accountSlice";
 import { getCommunity } from "../features/communities/communitiesSlice";
 import { YELLOW } from "../settings/colors";
-import { hexToRGB } from '../../utils'
+import { hexToRGB, pickBarStyle } from '../../utils'
+
 
 let splashTimer;
 const SplashScreen = props => {
+    const insets = useSafeAreaInsets();
     const [fontsLoaded] = useFonts({ WorkSans_800ExtraBold });
 
     const [colorAnimation, setColorAnimation] = useState(new Animated.Value(0));
@@ -190,8 +193,12 @@ const SplashScreen = props => {
     if (!fontsLoaded) {
         return <View style={styles.container} />;
     } else {
+        const staticBackgroundColor = page === "secondary" ? `#${props.community?.primary_color || "#000000"}` : YELLOW;
         return (
             <View style={styles.container}>
+                <View style={{ height: insets.top }}>
+                    <StatusBar hidden={ true }/>
+                </View>
                 <Animated.View style={{...styles.container, backgroundColor: backgroundColor }}>
                     <Animated.Text style={[ styles.title, { color: textColor, opacity: mainHeaderOpacity }]}>Everyone's a</Animated.Text>
                     <Animated.Text style={[ styles.title, { color: textColor, fontSize: secondaryHeaderFontSize, opacity: secondaryHeaderOpacity }]}>{ props.community?.name }</Animated.Text>
