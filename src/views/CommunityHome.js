@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, Text } from "react-native";
 import { connect } from "react-redux";
 import { setItemAsync } from 'expo-secure-store';
 
@@ -34,6 +34,15 @@ const CommunityHome = (props) => {
     const renderProductList = () => {
         const data = selectedProductList === "Browse" ? props.allProducts : props.productsWithRatings
 
+        let emptyMessage = '';
+        if (!props.productsLoading) {
+            if (selectedProductList === "Browse") {
+                emptyMessage = ""
+            } else {
+                emptyMessage = "You don't have any reviews just yet. Review some products and they will appear here."
+            }
+        }
+
         return (
             <FlatList
                 removeClippedSubviews
@@ -45,7 +54,9 @@ const CommunityHome = (props) => {
                 keyExtractor={ item => item.id }
                 onEndReached={ () => getMoreProducts() }
                 onEndReachedThreshold={ .75 }
-                contentContainerStyle={{ alignItems: 'center', paddingBottom: 175 }}/>
+                contentContainerStyle={{ alignItems: 'center', paddingBottom: 175 }}
+                ListEmptyComponent= {<Text style={ styles.emptyMessage }>{ emptyMessage }</Text>}
+            />
         )
     }
 
@@ -91,6 +102,16 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 8,
         borderBottomLeftRadius: 8,
         margin: 10,
+    },
+    emptyMessage: {
+        fontStyle: "italic",
+        fontFamily: "Helvetica Neue",
+        fontSize: 16,
+        paddingTop: 15,
+        paddingBottom: 5,
+        paddingLeft: 15,
+        paddingRight: 15,
+        textAlign: "center"
     }
 });
 
