@@ -190,7 +190,6 @@ export const refreshSession = createAsyncThunk('account/refreshSession', async (
     const response = await client.send(command);
 
     await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
-    await setItemAsync("RefreshToken", response.AuthenticationResult.RefreshToken);
 
     return {
         loggedIn: true
