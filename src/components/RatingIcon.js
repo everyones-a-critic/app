@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, Pressable, View } from "react-native";
 import { connect } from "react-redux";
 
@@ -8,14 +8,16 @@ import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
 import AuthenticationProvider from "./AuthenticationProvider";
 import { createOrUpdateRating, archiveRating } from "../features/ratings/ratingsSlice";
+import { removeRatingFromProduct, addRatingToProduct } from "../features/products/productsSlice";
 import { GRAY, LIGHTGRAY } from "../settings/colors";
 
 
 const RatingIcon = (props) => {
     const [pressed, setPressed] = useState(props.selected);
+    const [previousRatingId, setPreviousRatingId] = useState(null);
     const selected = props.value === props.rating?.roundedRating;
 
-    const onPress = () => {
+    const onPress = async () => {
         if (selected) {
             if (!props.bottomSheetVisible) {
                 props.onAddRating();
@@ -24,9 +26,14 @@ const RatingIcon = (props) => {
                     productId: props.focusedProductId,
                     ratingId: props.rating.id
                 });
+                props.removeRatingFromProduct({
+                    communityId: props.communityId,
+                    ratingId: props.rating.id
+                })
                 props.onRemoveRating();
             }
         } else {
+            setPreviousRatingId(props.rating?.id)
             props.createOrUpdateRating({
                 productId: props.focusedProductId,
                 rating: props.value - .33
@@ -34,6 +41,19 @@ const RatingIcon = (props) => {
             props.onAddRating();
         }
     }
+
+    useEffect(() => {
+        if (
+            props.rating?.id !== undefined && props.rating?.id !== null && previousRatingId !== null &&
+            previousRatingId !== props.rating?.id
+        ) {
+            props.addRatingToProduct({
+                productId: props.focusedProductId,
+                communityId: props.communityId,
+                rating: props.rating
+            })
+        }
+    }, [props.rating?.id]);
 
     const getIconStyles = () => {
         let styles = {};
@@ -101,6 +121,7 @@ const mapStateToProps = state => {
 
     return {
         focusedProductId: productId,
+        communityId: state.products.focusedProduct?.community_id,
         rating: state.ratings.mostRecentRatings[productId],
         errors: state.ratings.errors[productId] || [],
         requestStatus: getRequestStatus(),
@@ -109,4 +130,6 @@ const mapStateToProps = state => {
     };
 }
 
-export default connect(mapStateToProps, { createOrUpdateRating, archiveRating })(RatingIcon);
+export default connect(mapStateToProps, {
+    createOrUpdateRating, archiveRating, removeRatingFromProduct, addRatingToProduct
+})(RatingIcon);

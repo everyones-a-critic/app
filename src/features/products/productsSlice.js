@@ -125,6 +125,33 @@ export const productsSlice = createSlice({
                     state.allWithRatingsByCommunityRequestMetadata[key].status = 'idle';
                 };
             }
+        },
+        removeRatingFromProduct: (state, action) => {
+            const communityId = action.payload.communityId
+            let filteredProducts = []
+            const currentProducts = state.allWithRatingsByCommunity[communityId];
+            if (currentProducts) {
+                for (let i = 0; i < currentProducts.length; i++) {
+                    const product = state.allWithRatingsByCommunity[communityId][i];
+                    if (product.rating?.id != action.payload.ratingId) {
+                        filteredProducts.push(product)
+                    }
+                }
+            }
+            state.allWithRatingsByCommunity[communityId] = filteredProducts;
+        },
+        addRatingToProduct: (state, action) => {
+            const communityId = action.payload.communityId
+            const productId = action.payload.productId
+            let productList = state.allWithRatingsByCommunity[communityId];
+            for (let i = 0; i < state.allByCommunity[communityId].length; i++) {
+                const product = state.allByCommunity[communityId][i];
+                if (product.id === productId) {
+                    productList.push(Object.assign({ rating: action.payload.rating }, product));
+                    break;
+                }
+            }
+            state.allWithRatingsByCommunity[communityId] = productList;
         }
     },
     extraReducers(builder) {
@@ -231,5 +258,5 @@ export const productsSlice = createSlice({
     }
 });
 
-export const { resetRequestStatuses } = productsSlice.actions;
+export const { resetRequestStatuses, removeRatingFromProduct, addRatingToProduct } = productsSlice.actions;
 export default productsSlice.reducer;
