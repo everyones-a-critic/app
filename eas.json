@@ -3,6 +3,11 @@
     "preview": {
       "distribution": "internal"
     },
+    "simulator": {
+      "ios": {
+          "simulator": true
+      }
+    },
     "production": {}
   }
 }
