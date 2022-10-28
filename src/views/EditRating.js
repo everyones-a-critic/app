@@ -111,6 +111,7 @@ const EditRating = props => {
                             onFocus={ () => props.bottomSheetRef.current.snapToIndex(1) }
                             value={ comments }
                             onChangeText={ text => setComments(text) }
+                            returnKeyType={ 'done' }
                             style={ styles.textArea } multiline={ true } />
                     </ScrollView>
                 </KeyboardAvoidingView>
