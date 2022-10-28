@@ -11,13 +11,6 @@ import Pill from "../components/Pill";
 import ProductCard from "../components/ProductCard";
 
 
-// TODO:
-// 1) Tests
-// --
-// 2) RatedProducts list
-// 3) Add Pill selection and changing which list is presented
-
-
 const CommunityHome = (props) => {
     const communityId = props.route.params?.communityId;
     const [selectedProductList, setSelectedProductList] = useState("Browse")
@@ -62,7 +55,7 @@ const CommunityHome = (props) => {
             community={ props.community }
             navigation= { props.navigation }
             route= { props.route }
-            requestStatus={ props.authExpired }
+            authExpired={ props.authExpired }
             navigation={ props.navigation }
             errors = { props.errors }
         >
@@ -112,29 +105,23 @@ const mapStateToProps = state => {
     }
 
     const checkForExpiredAuth = () => {
-        const productAuthExpired = Object.keys(state.products.allByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allByCommunityRequestMetadata[key]?.status === 'expiredAuth') {
-                return true;
-            }
-        });
-
-        const withRatingsAuthExpired = Object.keys(state.products.allWithRatingsByCommunityRequestMetadata).forEach(key => {
-            if (state.products.allByCommunityRequestMetadata[key]?.status === 'expiredAuth') {
-                return true;
-            }
-        });
-
-        const ratingsAuthExpired = Object.keys(state.ratings.requestMetadata).forEach(key => {
-            if (state.ratings.requestMetadata[key]?.status === 'expiredAuth') {
-                return true;
-            }
-        });
-
-        if (productAuthExpired || state.communities.getOneRequestMetadata.status == 'expiredAuth') {
-            return 'expiredAuth';
-        } else {
-            return '';
+        if (state.products.allByCommunityRequestMetadata[communityId]?.status === 'expiredAuth') {
+            return true;
         }
+
+        if (state.products.allByCommunityRequestMetadata[communityId]?.status === 'expiredAuth') {
+            return true;
+        }
+
+        if (state.ratings.requestMetadata[communityId]?.status === 'expiredAuth') {
+            return true;
+        }
+
+        if (state.communities.getOneRequestMetadata.status == 'expiredAuth') {
+            return true;
+        }
+
+        return false
     };
 
     const checkForErrors = () => {

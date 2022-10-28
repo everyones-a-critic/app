@@ -6,6 +6,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
 
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
@@ -16,6 +19,7 @@ import ratingsReducer from "../features/ratings/ratingsSlice";
 
 import CommunityHome from './CommunityHome';
 import ProductHome from './ProductHome';
+import SignIn from './SignIn';
 
 
 let store;
@@ -28,10 +32,21 @@ beforeEach(() => {
             ratings: ratingsReducer
         }
     });
+
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test AccessToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
 });
 
+afterEach(() => {
+    cognitoMock.reset();
+});
 
-test('all products should load', async() => {
+const renderCommunityHomeComponent = async () => {
     let screen;
     await waitFor(() => {
         screen = render(
@@ -44,11 +59,18 @@ test('all products should load', async() => {
                             component={ CommunityHome }
                             options={{ headerShown: false }} />
                         <Stack.Screen name="Product Home" component={ ProductHome } options={{ headerShown: false }} />
+                        <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
             </Provider>
         );
     });
+
+    return screen;
+}
+
+test('all products should load', async() => {
+    const screen = await renderCommunityHomeComponent();
     let productCards = [];
     await act(async() => {
         productCards = await screen.findAllByLabelText("Product Header");
@@ -72,23 +94,7 @@ test('all products should load', async() => {
 });
 
 test('products with ratings should load', async() => {
-    let screen;
-    await waitFor(() => {
-        screen = render(
-            <Provider store={store}>
-                <NavigationContainer>
-                    <Stack.Navigator>
-                        <Stack.Screen
-                            name="Community Home"
-                            initialParams={{ communityId: '3' }}
-                            component={ CommunityHome }
-                            options={{ headerShown: false }} />
-                        <Stack.Screen name="Product Home" component={ ProductHome } options={{ headerShown: false }} />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            </Provider>
-        );
-    });
+    const screen = await renderCommunityHomeComponent();
 
     await act(async() => await fireEvent(screen.getByText("Your Reviews"), 'Press'));
 

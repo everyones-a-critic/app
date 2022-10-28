@@ -5,6 +5,10 @@ const { act } = TestRenderer;
 // import { State } from 'react-native-gesture-handler';
 import axios from 'axios';
 
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
@@ -55,10 +59,19 @@ beforeEach(() => {
             'data': {}
         }
     });
+
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test AccessToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
 });
 
 afterEach(() => {
     jest.clearAllMocks();
+    cognitoMock.reset();
 });
 
 jest.useFakeTimers({doNotFake: [
@@ -315,6 +328,10 @@ describe('Error modal renders', () => {
 
 describe('User is routed to login page', () => {
     test('upon enrolled list error', async () => {
+        const err = new Error("That password is wrong");
+        err.name = "NotAuthorizedException";
+        cognitoMock.on(InitiateAuthCommand).rejects(err);
+
         const rejectValue = {
             response: {
                 status: 401,
@@ -336,6 +353,10 @@ describe('User is routed to login page', () => {
     });
 
     test('upon list communities error', async () => {
+        const err = new Error("That password is wrong");
+        err.name = "NotAuthorizedException";
+        cognitoMock.on(InitiateAuthCommand).rejects(err);
+
         const rejectValue = {
             response: {
                 status: 401,
@@ -357,6 +378,10 @@ describe('User is routed to login page', () => {
     });
 
     test('upon search error', async () => {
+        const err = new Error("That password is wrong");
+        err.name = "NotAuthorizedException";
+        cognitoMock.on(InitiateAuthCommand).rejects(err);
+
         const rejectValue = {
             response: {
                 status: 401,
@@ -380,6 +405,10 @@ describe('User is routed to login page', () => {
     });
 
     test('upon join error', async () => {
+        const err = new Error("That password is wrong");
+        err.name = "NotAuthorizedException";
+        cognitoMock.on(InitiateAuthCommand).rejects(err);
+
         const rejectValue = {
             response: {
                 status: 401,

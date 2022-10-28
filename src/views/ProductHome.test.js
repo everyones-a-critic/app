@@ -7,6 +7,10 @@ import axios from 'axios';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import accountReducer from "../features/account/accountSlice";
@@ -16,6 +20,7 @@ import ratingsReducer from "../features/ratings/ratingsSlice";
 import { mockReturnValues } from '../../testing/apiMockResources';
 
 import ProductHome from './ProductHome';
+import SignIn from './SignIn';
 
 
 let store;
@@ -40,22 +45,33 @@ beforeEach(() => {
     axios.get.mockImplementation( url => {
         return mockReturnValues.get[url]
     });
+
+    jest.useFakeTimers({doNotFake: [
+        'setImmediate',
+        'setInterval',
+        'cancelAnimationFrame',
+        'cancelIdleCallback',
+        'clearImmediate',
+        'clearInterval',
+        'nextTick',
+        'queueMicrotask',
+    ]});
+
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test AccessToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
 });
 
 afterEach(() => {
     jest.clearAllMocks();
+    jest.runOnlyPendingTimers()
+    jest.useRealTimers()
+    cognitoMock.reset();
 });
-
-jest.useFakeTimers({doNotFake: [
-    'setImmediate',
-    'setInterval',
-    'cancelAnimationFrame',
-    'cancelIdleCallback',
-    'clearImmediate',
-    'clearInterval',
-    'nextTick',
-    'queueMicrotask',
-]});
 
 
 const renderView = async () => {
@@ -69,6 +85,10 @@ const renderView = async () => {
                             name="Product Home"
                             initialParams={{ communityId: '3', productId: '1' }}
                             component={ ProductHome }
+                            options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="Sign In"
+                            component={ SignIn }
                             options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
@@ -158,7 +178,7 @@ test('when comparison selections are changed, patch is sent to api', async () =>
                 productId: '1',
                 rating: 4,
                 archived: false,
-                comments: null,
+                comments: 'This is a test',
             }
         }
     };
@@ -178,7 +198,6 @@ test('when comparison selections are changed, patch is sent to api', async () =>
 
     await act(async() => await fireEvent(screen.getByText("Better"), 'Press'));
 
-    await act(async() => await jest.runAllTimers());
     expect(axios.patch).toHaveBeenCalledWith("/products/1/ratings/1/", { "rating": 4 });
 });
 
@@ -217,6 +236,5 @@ test('when comments are added, patch is sent to api', async () => {
 
     expect(axios.patch).toHaveBeenCalledWith("/products/1/ratings/1/", {
         comments: "hi there.",
-        rating: 3.67
     });
 });

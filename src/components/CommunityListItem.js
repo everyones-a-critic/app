@@ -7,7 +7,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 
+import AuthenticationProvider from "./AuthenticationProvider";
 import { joinCommunity, leaveCommunity } from "../features/communities/communitiesSlice";
+
 
 let deleteButtonExposed = false
 const CommunityListItem = props => {
@@ -147,24 +149,26 @@ const CommunityListItem = props => {
         }
 
         return (
-            <Pressable
-                onPress={() => onPress()}
-                disabled={ disabled }
-                accessibilityState={ disabled ? 'disabled' : null }
-                accessibilityRole={ accessibilityRole }
-                accessibilityHint={ accessibilityHint }
-                style={[ styles.communityContainer, {
-                    display: hidden ? "none" : "flex",
-                    opacity: disabled ? 0.5 : 1
-                }]}>
-                <View style={[styles.communityIconBackground, {backgroundColor: `#${props.community.primary_color}`}]}>
-                    <FontAwesomeIcon size={22} color={`#${props.community.secondary_color}`} icon={iconDef}/>
-                </View>
-                <View style={[ styles.nameContainer, props.style ]}>
-                    <Text style={styles.communityName}>{props.community.display_name}</Text>
-                    { renderActionIcon() }
-                </View>
-            </Pressable>
+            <AuthenticationProvider authExpired={ props.authExpired } navigation={ props.navigation }>
+                <Pressable
+                    onPress={() => onPress()}
+                    disabled={ disabled }
+                    accessibilityState={ disabled ? 'disabled' : null }
+                    accessibilityRole={ accessibilityRole }
+                    accessibilityHint={ accessibilityHint }
+                    style={[ styles.communityContainer, {
+                        display: hidden ? "none" : "flex",
+                        opacity: disabled ? 0.5 : 1
+                    }]}>
+                    <View style={[styles.communityIconBackground, {backgroundColor: `#${props.community.primary_color}`}]}>
+                        <FontAwesomeIcon size={22} color={`#${props.community.secondary_color}`} icon={iconDef}/>
+                    </View>
+                    <View style={[ styles.nameContainer, props.style ]}>
+                        <Text style={styles.communityName}>{props.community.display_name}</Text>
+                        { renderActionIcon() }
+                    </View>
+                </Pressable>
+            </AuthenticationProvider>
         )
     }
 
@@ -222,7 +226,20 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {};
+    const getAuthExpired = () => {
+        if (state.communities.joinRequestMetadata.status === 'expiredAuth') {
+            return true;
+        }
+        if (state.communities.leaveRequestMetadata.status === 'expiredAuth') {
+            return true;
+        }
+
+        return false;
+    }
+
+    return {
+        authExpired: getAuthExpired()
+    };
 }
 
 export default connect(mapStateToProps, { joinCommunity, leaveCommunity })(CommunityListItem);

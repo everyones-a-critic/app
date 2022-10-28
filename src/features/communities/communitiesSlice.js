@@ -186,10 +186,35 @@ export const communitiesSlice = createSlice({
         leaveRequestMetadata: {
             status: 'idle'
         },
-        errors: [],
-        validSession: true
+        errors: []
     },
-    reducers: {},
+    reducers: {
+        resetRequestStatuses: state => {
+            if (state.getOneRequestMetadata.status === 'expiredAuth') {
+                state.getOneRequestMetadata.status = 'idle';
+            }
+
+            if (state.allCommunitiesRequestMetadata.status === 'expiredAuth') {
+                state.allCommunitiesRequestMetadata.status = 'idle';
+            }
+
+            if (state.enrolledCommunitiesRequestMetadata.status === 'expiredAuth') {
+                state.enrolledCommunitiesRequestMetadata.status = 'idle';
+            }
+
+            if (state.searchRequestMetadata.status === 'expiredAuth') {
+                state.searchRequestMetadata.status = 'idle';
+            }
+
+            if (state.joinRequestMetadata.status === 'expiredAuth') {
+                state.joinRequestMetadata.status = 'idle';
+            }
+
+            if (state.leaveRequestMetadata.status === 'expiredAuth') {
+                state.leaveRequestMetadata.status = 'idle';
+            }
+        }
+    },
     extraReducers(builder) {
         builder
             .addCase(listMoreCommunities.pending, (state, action) => {
@@ -324,4 +349,5 @@ export const communitiesSlice = createSlice({
     }
 });
 
+export const { resetRequestStatuses } = communitiesSlice.actions;
 export default communitiesSlice.reducer;

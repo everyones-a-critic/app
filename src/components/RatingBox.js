@@ -28,30 +28,35 @@ const RatingBox = props => {
             >
                 <RatingIcon
                     value={ 1 } currentRating={ props.rating } color={ `#${props.community.primary_color}` } icon={'face-sad-tear'}
+                    navigation={ props.navigation }
                     onRemoveRating={ () => props.onRemoveRating() }
                     onAddRating={ () => props.onAddRating() }
                     bottomSheetVisible={ props.bottomSheetVisible }
                 />
                 <RatingIcon
                     value={ 2 } currentRating={ props.rating } color={ `#${props.community.primary_color}` } icon={'face-frown'}
+                    navigation={ props.navigation }
                     onRemoveRating={ () => props.onRemoveRating() }
                     onAddRating={ () => props.onAddRating() }
                     bottomSheetVisible={ props.bottomSheetVisible }
                 />
                 <RatingIcon
                     value={ 3 } currentRating={ props.rating } color={ `#${props.community.primary_color}` } icon={'face-meh'}
+                    navigation={ props.navigation }
                     onRemoveRating={ () => props.onRemoveRating() }
                     onAddRating={ () => props.onAddRating() }
                     bottomSheetVisible={ props.bottomSheetVisible }
                 />
                 <RatingIcon
                     value={ 4 } currentRating={ props.rating } color={ `#${props.community.primary_color}` } icon={'face-smile'}
+                    navigation={ props.navigation }
                     onRemoveRating={ () => props.onRemoveRating() }
                     onAddRating={ () => props.onAddRating() }
                     bottomSheetVisible={ props.bottomSheetVisible }
                 />
                 <RatingIcon
                     value={ 5 } currentRating={ props.rating } color={ `#${props.community.primary_color}` } icon={'face-grin-hearts'}
+                    navigation={ props.navigation }
                     onRemoveRating={ () => props.onRemoveRating() }
                     onAddRating={ () => props.onAddRating() }
                     bottomSheetVisible={ props.bottomSheetVisible }

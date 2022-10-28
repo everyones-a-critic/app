@@ -1,25 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from "react-redux";
 
-import { signOut } from "../features/account/accountSlice";
+import { expireSession, refreshSession } from "../features/account/accountSlice";
+import { resetRequestStatuses as resetCommunities } from "../features/communities/communitiesSlice";
+import { resetRequestStatuses as resetProducts } from "../features/products/productsSlice";
+import { resetRequestStatuses as resetRatings } from "../features/ratings/ratingsSlice";
 
 
-class AuthenticationProvider extends React.Component {
-    componentDidUpdate = () => {
-        if (this.props.requestStatus === "expiredAuth") {
-            this.props.signOut()
-
-            const { index, routes } =  this.props.navigation.getState();
-            this.props.navigation.navigate('Sign In', {
-                next: routes[index].name,
-                customMessage: 'Your session has expired, please sign in again.'
-            });
+const AuthenticationProvider = props => {
+    useEffect(() => {
+        if (props.authExpired) {
+            props.expireSession();
+            props.resetCommunities();
+            props.resetProducts();
+            props.resetRatings();
         }
-    }
+    }, [ props.authExpired ]);
 
-    render = () => {
-        return <React.Fragment>{ this.props.children }</React.Fragment>
+    useEffect(() => {
+        if (props.loggedIn === null) {
+            props.refreshSession()
+        }
+        if (props.loggedIn === false) {
+            const { index, routes } =  props.navigation.getState();
+            if (routes[index].name !== "Sign In") {
+                props.navigation.navigate('Sign In', {
+                    next: routes[index].name,
+                    nextParams: routes[index].params,
+                    customMessage: 'Your session has expired, please sign in again.'
+                });
+            }
+        }
+    }, [ props.loggedIn ]);
+
+    return <React.Fragment>{ props.children }</React.Fragment>
+}
+
+const mapStateToProps = state => {
+    return {
+        loggedIn: state.account.loggedIn
     }
 }
 
-export default connect(null, { signOut })(AuthenticationProvider);
+export default connect(mapStateToProps, {
+    expireSession, refreshSession, resetCommunities, resetProducts, resetRatings
+})(AuthenticationProvider);

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { LIGHTGRAY } from "../settings/colors";
 
 import PillBox from  "../components/PillBox";
+import AuthenticationProvider from  "../components/AuthenticationProvider";
 import { updateRating } from "../features/ratings/ratingsSlice";
 import uuid from 'react-native-uuid';
 
@@ -68,51 +69,53 @@ const EditRating = props => {
     }, [patchData, props.requestStatus]);
 
     return (
-        <View style={{ flex: 1 }}>
-            <Text accessibilityRole="header" style={[styles.bottomSheetHeader, { color: `#${props.community.secondary_color}` }]}>
-                Your Review
-            </Text>
-            <KeyboardAvoidingView
-                behavior={ Platform.OS === "ios" ? "padding" : "height" }
-                style={{ flex: 1 }}
-            >
-                <ScrollView style={ styles.contentContainer } contentContainerStyle={[ styles.contentContainerContainerStyle ]}>
-                    <View style={ styles.ratingContainer }>
-                        <Text style={[ styles.text, styles.label ]}>Your Rating: </Text>
-                        <Text accessibilityRole="text" accessibilityLabel="Your Rating" style={ styles.text }>{ props.rating?.roundedRating }</Text>
-                    </View>
-                    <Text nativeId="comparisonLabel" style={[ styles.text, styles.label ]} >
-                        How does this { props.community.name.toLowerCase() } compare to other { props.community.plural_name.toLowerCase() } you've
-                        rated a { props.rating?.roundedRating }?
-                    </Text>
-                    <View style={ styles.pillBoxContainer }>
-                        <PillBox
-                            accessibilityLabelledBy="comparisonLabel"
-                            navigation={ props.navigation }
-                            style={ styles.pillContainer }
-                            pills={[
-                                { value: -0.66, label: "Worse" },
-                                { value: -0.33, label: "About the Same" },
-                                { value: 0, label: "Better" }
-                            ]}
-                            primaryColor={ primaryColor }
-                            secondaryColor={ secondaryColor }
-                            selected={ adjustment }
-                            onChange={ value => setAdjustment(value) }
-                        />
-                    </View>
-                    <Text style={[ styles.text, styles.label ]}>Comments</Text>
-                    <Text style={[ styles.text, styles.secondaryLabel ]}>(optional)</Text>
-                    <TextInput
-                        accessibilityLabel="Comments"
-                        accessibilityHint="Enter any notes or thoughts here."
-                        onFocus={ () => props.bottomSheetRef.current.snapToIndex(1) }
-                        value={ comments }
-                        onChangeText={ text => setComments(text) }
-                        style={ styles.textArea } multiline={ true } />
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </View>
+        <AuthenticationProvider authExpired={ props.authExpired } navigation={ props.navigation }>
+            <View style={{ flex: 1 }}>
+                <Text accessibilityRole="header" style={[styles.bottomSheetHeader, { color: `#${props.community.secondary_color}` }]}>
+                    Your Review
+                </Text>
+                <KeyboardAvoidingView
+                    behavior={ Platform.OS === "ios" ? "padding" : "height" }
+                    style={{ flex: 1 }}
+                >
+                    <ScrollView style={ styles.contentContainer } contentContainerStyle={[ styles.contentContainerContainerStyle ]}>
+                        <View style={ styles.ratingContainer }>
+                            <Text style={[ styles.text, styles.label ]}>Your Rating: </Text>
+                            <Text accessibilityRole="text" accessibilityLabel="Your Rating" style={ styles.text }>{ props.rating?.roundedRating }</Text>
+                        </View>
+                        <Text nativeId="comparisonLabel" style={[ styles.text, styles.label ]} >
+                            How does this { props.community.name.toLowerCase() } compare to other { props.community.plural_name.toLowerCase() } you've
+                            rated a { props.rating?.roundedRating }?
+                        </Text>
+                        <View style={ styles.pillBoxContainer }>
+                            <PillBox
+                                accessibilityLabelledBy="comparisonLabel"
+                                navigation={ props.navigation }
+                                style={ styles.pillContainer }
+                                pills={[
+                                    { value: -0.66, label: "Worse" },
+                                    { value: -0.33, label: "About the Same" },
+                                    { value: 0, label: "Better" }
+                                ]}
+                                primaryColor={ primaryColor }
+                                secondaryColor={ secondaryColor }
+                                selected={ adjustment }
+                                onChange={ value => setAdjustment(value) }
+                            />
+                        </View>
+                        <Text style={[ styles.text, styles.label ]}>Comments</Text>
+                        <Text style={[ styles.text, styles.secondaryLabel ]}>(optional)</Text>
+                        <TextInput
+                            accessibilityLabel="Comments"
+                            accessibilityHint="Enter any notes or thoughts here."
+                            onFocus={ () => props.bottomSheetRef.current.snapToIndex(1) }
+                            value={ comments }
+                            onChangeText={ text => setComments(text) }
+                            style={ styles.textArea } multiline={ true } />
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </View>
+        </AuthenticationProvider>
     )
 };
 
@@ -180,6 +183,7 @@ const mapStateToProps = state => {
         focusedProductId: productId,
         rating: state.ratings.mostRecentRatings[productId],
         requestStatus: state.ratings.requestMetadata[productId]?.status,
+        authExpired: state.ratings.requestMetadata[productId]?.status === "authExpired"
     }
 }
 

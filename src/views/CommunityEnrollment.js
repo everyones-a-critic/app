@@ -122,7 +122,7 @@ class CommunityEnrollment extends React.Component {
 
     render = () => {
         return (
-            <AuthenticationProvider requestStatus={ this.props.isAuthExpired } navigation={ this.props.navigation }>
+            <AuthenticationProvider authExpired={ this.props.authExpired } navigation={ this.props.navigation }>
                 <SafeAreaProvider>
                     <SafeAreaInsetsContext.Consumer>
                         { insets => <View style= {{ flex: 1 }}>
@@ -283,13 +283,11 @@ const mapStateToProps = state => {
         if (
             state.communities.allCommunitiesRequestMetadata.status === "expiredAuth" ||
             state.communities.enrolledCommunitiesRequestMetadata.status === "expiredAuth" ||
-            state.communities.searchRequestMetadata.status === "expiredAuth" ||
-            state.communities.joinRequestMetadata.status === "expiredAuth" ||
-            state.communities.leaveRequestMetadata.status === "expiredAuth"
+            state.communities.searchRequestMetadata.status === "expiredAuth"
         ) {
-            return "expiredAuth";
+            return true;
         } else {
-            return "";
+            return false;
         }
     }
 
@@ -300,7 +298,7 @@ const mapStateToProps = state => {
         enrolledCommunitiesLoading: state.communities.enrolledCommunitiesRequestMetadata.status === "loading",
         searchResults: filterOutEnrolledCommunities(state.communities.searchResults),
         searchResultsLoading: state.communities.searchRequestMetadata.status === "loading",
-        isAuthExpired: getIsAuthExpired(),
+        authExpired: getIsAuthExpired(),
         errors: state.communities.errors.length > 0 ? ["Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"] : [],
     }
 }

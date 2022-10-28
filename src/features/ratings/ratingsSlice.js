@@ -108,7 +108,15 @@ export const ratingsSlice = createSlice({
         requestMetadata: {},
         errors: {},
     },
-    reducers: {},
+    reducers: {
+        resetRequestStatuses: state => {
+            for (const key in state.requestMetadata) {
+                if (state.requestMetadata[key]?.status === "expiredAuth"){
+                    state.requestMetadata[key].status = 'idle';
+                };
+            }
+        }
+    },
     extraReducers(builder) {
         builder
             .addCase(getMostRecentRating.pending, (state, action) => {
@@ -243,4 +251,5 @@ export const ratingsSlice = createSlice({
     }
 });
 
+export const { resetRequestStatuses } = ratingsSlice.actions;
 export default ratingsSlice.reducer;

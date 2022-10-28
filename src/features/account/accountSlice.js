@@ -6,7 +6,8 @@ import {
     InitiateAuthCommand,
     ResendConfirmationCodeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
-import { setItemAsync } from 'expo-secure-store';
+import { setItemAsync, getItemAsync } from 'expo-secure-store';
+import { Buffer } from 'buffer/';
 
 
 export const signUp = createAsyncThunk('account/signUp', async formData => {
@@ -172,13 +173,38 @@ export const signOut = createAsyncThunk('account/signOut', async () => {
     };
 });
 
+export const refreshSession = createAsyncThunk('account/refreshSession', async () => {
+    const input = {
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        UserPoolId: process.env.COGNITO_USER_POOL_ID,
+        AuthFlow: "REFRESH_TOKEN_AUTH",
+        AuthParameters: {
+            REFRESH_TOKEN: await getItemAsync('RefreshToken') || "_",
+        }
+    };
+
+    const client = new CognitoIdentityProviderClient({
+        region: process.env.COGNITO_REGION,
+    });
+    const command = new InitiateAuthCommand(input);
+    const response = await client.send(command);
+
+    await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
+    await setItemAsync("RefreshToken", response.AuthenticationResult.RefreshToken);
+
+    return {
+        loggedIn: true
+    };
+});
+
+
 export const accountSlice = createSlice({
     name: 'account',
     initialState: {
         email: null,
         confirmed: false,
         requestStatus: 'idle',
-        loggedIn: false,
+        loggedIn: null,
         errors: {
             fields: {},
             form: []
@@ -189,6 +215,24 @@ export const accountSlice = createSlice({
             state.errors = {
                 fields: {},
                 form: []
+            }
+        },
+        expireSession: state => {
+            state.loggedIn = false;
+        },
+        restartSession: (state, action) => {
+            if (action.payload) {
+                const chunks = action.payload.split(".")
+                if (chunks.length === 3) {
+                    const encodedPayload = chunks[1];
+                    const buffer = new Buffer.from(encodedPayload, 'base64')
+                    const decodedPayload = buffer.toString();
+                    const jsonPayload = JSON.parse(decodedPayload);
+                    if (jsonPayload?.email !== undefined && jsonPayload?.email !== null) {
+                        state.loggedIn = true;
+                        state.email = jsonPayload.email;
+                    }
+                }
             }
         }
     },
@@ -307,13 +351,34 @@ export const accountSlice = createSlice({
             })
             .addCase(signOut.fulfilled, (state, action) => {
                 state.requestStatus = 'succeeded';
-                state.confirmed = true;
-                state.email = action.payload.email;
                 state.loggedIn = action.payload.loggedIn;
+            })
+            .addCase(refreshSession.pending, (state, action) => {
+                state.requestStatus = 'loading';
+                state.errors = {
+                    fields: {},
+                    form: []
+                }
+            })
+            .addCase(refreshSession.fulfilled, (state, action) => {
+                state.requestStatus = 'succeeded';
+                state.loggedIn = action.payload.loggedIn;
+            })
+            .addCase(refreshSession.rejected, (state, action) => {
+                state.requestStatus = 'failed';
+                state.loggedIn = false;
+                switch (action.error.name) {
+                    case 'NotAuthorizedException':
+                        state.requestStatus = 'succeeded';
+                        break;
+                    default:
+                        state.errors.form = [
+                            action.error.message
+                        ];
+                }
             })
     }
 });
 
-export const { resetErrors } = accountSlice.actions;
-
+export const { resetErrors, expireSession, restartSession } = accountSlice.actions;
 export default accountSlice.reducer;

@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
+import AuthenticationProvider from "./AuthenticationProvider";
 import { createOrUpdateRating, archiveRating } from "../features/ratings/ratingsSlice";
 import { GRAY, LIGHTGRAY } from "../settings/colors";
 
@@ -44,23 +45,25 @@ const RatingIcon = (props) => {
     }
 
     return (
-        <Pressable
-            accessibilityRole="radio"
-            accessibilityValue={{ text: props.value }}
-            accessibilityLabel={ props.value.toString() }
-            accessibilityHint={ `Rate this product a ${props.value}` }
-            onPressIn={ () => setPressed(true) }
-            onPressOut={ () => setPressed(false) }
-            onPress={ () => onPress() }
-            style={ styles.button }
-            disabled={ props.disabled }
-        >
-            <FontAwesomeIcon
-                color={ props.disabled ? GRAY : props.color }
-                style={ getIconStyles() }
-                size={ 35 }
-                icon={ findIconDefinition({prefix: selected ? 'fas' : 'far', iconName: props.icon }) } />
-        </Pressable>
+        <AuthenticationProvider authExpired={ props.authExpired } navigation={ props.navigation }>
+            <Pressable
+                accessibilityRole="radio"
+                accessibilityValue={{ text: props.value }}
+                accessibilityLabel={ props.value.toString() }
+                accessibilityHint={ `Rate this product a ${props.value}` }
+                onPressIn={ () => setPressed(true) }
+                onPressOut={ () => setPressed(false) }
+                onPress={ () => onPress() }
+                style={ styles.button }
+                disabled={ props.disabled }
+            >
+                <FontAwesomeIcon
+                    color={ props.disabled ? GRAY : props.color }
+                    style={ getIconStyles() }
+                    size={ 35 }
+                    icon={ findIconDefinition({prefix: selected ? 'fas' : 'far', iconName: props.icon }) } />
+            </Pressable>
+        </AuthenticationProvider>
     );
 };
 
@@ -101,6 +104,7 @@ const mapStateToProps = state => {
         rating: state.ratings.mostRecentRatings[productId],
         errors: state.ratings.errors[productId] || [],
         requestStatus: getRequestStatus(),
+        authExpired: state.ratings.requestMetadata[productId]?.status === "authExpired",
         disabled: getDisabled(),
     };
 }

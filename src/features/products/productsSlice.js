@@ -44,7 +44,6 @@ export const listMoreProducts = createAsyncThunk('products/list', async (data, {
     }
 
     try {
-        console.log("Called with this url: ", url)
         const response = await api.get(url)
         return {
             products: response.data.results,
@@ -111,7 +110,23 @@ export const productsSlice = createSlice({
         errors: [],
         validSession: true
     },
-    reducers: {},
+    reducers: {
+        resetRequestStatuses: state => {
+            if (state.getOneRequestMetadata.status === 'expiredAuth') {
+                state.getOneRequestMetadata.status = 'idle';
+            }
+            for (const key in state.allByCommunityRequestMetadata) {
+                if (state.allByCommunityRequestMetadata[key]?.status === "expiredAuth"){
+                    state.allByCommunityRequestMetadata[key].status = 'idle';
+                };
+            }
+            for (const key in state.allWithRatingsByCommunityRequestMetadata) {
+                if (state.allWithRatingsByCommunityRequestMetadata[key]?.status === "expiredAuth"){
+                    state.allWithRatingsByCommunityRequestMetadata[key].status = 'idle';
+                };
+            }
+        }
+    },
     extraReducers(builder) {
         builder
             .addCase(listMoreProducts.pending, (state, action) => {
@@ -198,7 +213,7 @@ export const productsSlice = createSlice({
             })
             .addCase(listMoreProductsWithRatings.rejected, (state, action) => {
                 const communityId = action.meta.arg.communityId;
-                let requestMetadata = state.allWithRatingsByCommunity[communityId];
+                let requestMetadata = state.allWithRatingsByCommunityRequestMetadata[communityId];
                 requestMetadata.status = 'failed'
                 switch(action.payload?.status) {
                     case 401:
@@ -216,4 +231,5 @@ export const productsSlice = createSlice({
     }
 });
 
+export const { resetRequestStatuses } = productsSlice.actions;
 export default productsSlice.reducer;

@@ -3,6 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import accountReducer from "../features/account/accountSlice";
@@ -20,6 +24,18 @@ beforeEach(() => {
             communities: communitiesReducer,
         }
     });
+
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test AccessToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
+});
+
+afterEach(() => {
+    cognitoMock.reset();
 });
 
 test('should be able to navigate to Community Enrollment', async() => {

@@ -14,7 +14,7 @@ import ErrorModal from "./ErrorModal";
 import { YELLOW, GRAY } from "../settings/colors";
 
 
-const CommunityPage = ({ community, navigation, route, requestStatus, errors, children, loading, backButtonEnabled }) => {
+const CommunityPage = ({ community, navigation, route, authExpired, errors, children, loading, backButtonEnabled }) => {
     const bottomSheetRef = useRef(null);
 
     let [fontsLoaded] = useFonts({
@@ -37,7 +37,7 @@ const CommunityPage = ({ community, navigation, route, requestStatus, errors, ch
 
     return (
         <AuthenticationProvider
-            requestStatus={ requestStatus }
+            authExpired={ authExpired }
             navigation={ navigation }
         >
             <Loader loading={ loading || community === undefined || community === null || !fontsLoaded }>

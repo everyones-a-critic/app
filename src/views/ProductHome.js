@@ -81,6 +81,7 @@ const ProductHome = (props) => {
                         onAddRating={ () => openRatingSheet() }
                         bottomSheetVisible={ bottomSheetVisible }
                         style={ styles.ratingBox }
+                        navigation={ props.navigation }
                         community= { props.community }
                         product={ product } />
                     <View style={ styles.fieldContainer }>
@@ -136,7 +137,7 @@ const ProductHome = (props) => {
             community={ community }
             navigation= { props.navigation }
             route= { props.route }
-            requestStatus={ props.expiredAuth }
+            authExpired={ props.authExpired }
             navigation={ props.navigation }
             errors = { props.errors }
             loading= { props.loading }
@@ -201,9 +202,10 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
+    const productId = state.products.focusedProduct?.id;
     const getLoading = () => {
-        if (state.products.getOneRequestMetadata.status == 'loading' ||
-                state.communities.getOneRequestMetadata.status == 'loading') {
+        if (state.products.getOneRequestMetadata.status === 'loading' ||
+                state.communities.getOneRequestMetadata.status === 'loading') {
             return true;
         } else {
             return false;
@@ -211,27 +213,24 @@ const mapStateToProps = state => {
     };
 
     const checkForExpiredAuth = () => {
-        if (state.products.getOneRequestMetadata.status == 'expiredAuth' ||
-                state.communities.getOneRequestMetadata.status == 'expiredAuth') {
-            return 'expiredAuth';
-        } else {
-            return '';
+        if (state.products.getOneRequestMetadata.status === 'expiredAuth') {
+            return true;
         }
+        if (state.communities.getOneRequestMetadata.status === 'expiredAuth') {
+            return true;
+        }
+        if (state.ratings.requestMetadata[productId]?.status === 'expiredAuth') {
+            return true;
+        }
+
+        return false;
     };
 
     const checkForErrors = () => {
         const communityErrors = state.communities.errors;
         const productErrors = state.products.errors;
-        const productId = state.products.focusedProduct?.id;
         const ratingErrors = state.ratings.errors[productId] || [];
         if (communityErrors.length > 0 || productErrors.length > 0 || ratingErrors.length  > 0) {
-            console.log('communityErrors: ')
-            console.log(communityErrors)
-            console.log('productErrors: ')
-            console.log(productErrors)
-            console.log('ratingErrors: ')
-            console.log(ratingErrors)
-
             return [
                 "Please try again later. If the error persists, please reach out to support@everyonesacriticapp.com"
             ];
@@ -245,7 +244,7 @@ const mapStateToProps = state => {
         product: state.products.focusedProduct,
         rating: state.ratings.mostRecentRatings[state.products.focusedProduct?.id],
         loading: getLoading(),
-        expiredAuth: checkForExpiredAuth(),
+        authExpired: checkForExpiredAuth(),
         errors: checkForErrors(),
     }
 }

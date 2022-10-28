@@ -5,6 +5,10 @@ const { act } = TestRenderer;
 import { getItemAsync } from 'expo-secure-store';
 import axios from 'axios';
 
+import { mockClient } from 'aws-sdk-client-mock';
+import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
@@ -44,10 +48,19 @@ beforeEach(() => {
     getItemAsync.mockImplementation( key => {
         return Promise.resolve(mockStore[key])
     });
+
+    cognitoMock.on(InitiateAuthCommand).resolves({
+        AuthenticationResult: {
+            IdToken: "Test AccessToken",
+            RefreshToken: "Test RefreshToken",
+            TokenType: "Bearer"
+        }
+    });
 });
 
 afterEach(() => {
     jest.clearAllMocks();
+    cognitoMock.reset();
 });
 
 // Hit an issue here with waitFor depending on setInterval, so implementing workaround suggested here while

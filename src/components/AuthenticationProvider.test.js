@@ -19,11 +19,11 @@ const TestComponent = ({ navigation }) => {
     const [status, setStatus] = useState('loading');
 
     useEffect(() => {
-        setStatus('expiredAuth');
+        setStatus(true);
     })
 
     return (
-        <View><AuthenticationProvider requestStatus={ status } navigation={ navigation }>
+        <View><AuthenticationProvider authExpired={ status } navigation={ navigation }>
             <Text>Test</Text>
         </AuthenticationProvider></View>
     );

@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
+import { restartSession } from "../features/account/accountSlice";
 import { getCommunity } from "../features/communities/communitiesSlice";
 import { YELLOW } from "../settings/colors";
 import { hexToRGB } from '../../utils'
@@ -100,9 +101,11 @@ const SplashScreen = props => {
     // Data Loading
 
     const loadSetupData = async() => {
-        const token = await getItemAsync('RefreshToken');
-        if (token !== undefined && token !== null) {
+        const refreshToken = await getItemAsync('RefreshToken');
+        const identityToken = await getItemAsync('IdentityToken');
+        if (refreshToken !== undefined && refreshToken !== null) {
             setHasEverLoggedIn(true);
+            props.restartSession(identityToken);
             const communityId = await getItemAsync('MostRecentCommunityId');
             if (communityId !== undefined && communityId !== null) {
                 props.getCommunity({ id: communityId });
@@ -114,7 +117,12 @@ const SplashScreen = props => {
 
     useEffect(() => {
         if (readyFor === "navigateToCommunityHome") {
-            props.navigation.navigate('Community Home', { communityId: props.community.id });
+            // this if block shouldn't ever be binding, but sometimes in expo and React Navigation, SplashScreen
+            // is still rendering in the background, after navigating away
+
+            if (props.community?.id) {
+                props.navigation.navigate('Community Home', { communityId: props.community.id });
+            }
         }
     }, [ readyFor ]);
 
@@ -230,4 +238,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, { getCommunity })(SplashScreen);
+export default connect(mapStateToProps, { getCommunity, restartSession })(SplashScreen);
