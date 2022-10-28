@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, Image, View, TextInput, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { connect } from "react-redux";
 import { LIGHTGRAY } from "../settings/colors";
@@ -13,6 +13,7 @@ const EditRating = props => {
     const [ adjustment, setAdjustment ] = useState(null);
     const [ comments, setComments ] = useState(null);
     const [ patchData, setPatchData ] = useState(null);
+    const scrollView = useRef(null)
 
     const primaryColor = `#${props.community?.primary_color}`;
     const secondaryColor= `#${props.community?.secondary_color}`;
@@ -68,6 +69,11 @@ const EditRating = props => {
         }
     }, [patchData, props.requestStatus]);
 
+    const onCommentsFocus = () => {
+        props.bottomSheetRef.current.snapToIndex(1)
+        scrollView.current.scrollToEnd();
+    }
+
     return (
         <AuthenticationProvider authExpired={ props.authExpired } navigation={ props.navigation }>
             <View style={{ flex: 1 }}>
@@ -78,7 +84,11 @@ const EditRating = props => {
                     behavior={ Platform.OS === "ios" ? "padding" : "height" }
                     style={{ flex: 1 }}
                 >
-                    <ScrollView style={ styles.contentContainer } contentContainerStyle={[ styles.contentContainerContainerStyle ]}>
+                    <ScrollView
+                        ref ={ scrollView }
+                        style={ styles.contentContainer }
+                        contentContainerStyle={[ styles.contentContainerContainerStyle ]}
+                    >
                         <View style={ styles.ratingContainer }>
                             <Text style={[ styles.text, styles.label ]}>Your Rating: </Text>
                             <Text accessibilityRole="text" accessibilityLabel="Your Rating" style={ styles.text }>{ props.rating?.roundedRating }</Text>
@@ -108,7 +118,7 @@ const EditRating = props => {
                         <TextInput
                             accessibilityLabel="Comments"
                             accessibilityHint="Enter any notes or thoughts here."
-                            onFocus={ () => props.bottomSheetRef.current.snapToIndex(1) }
+                            onFocus={ () => onCommentsFocus() }
                             value={ comments }
                             onChangeText={ text => setComments(text) }
                             returnKeyType={ 'done' }
