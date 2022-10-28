@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, View, StyleSheet, Pressable, StatusBar, Image, FlatList } from "react-native";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -16,6 +16,7 @@ import { YELLOW, GRAY } from "../settings/colors";
 
 const CommunityPage = ({ community, navigation, route, authExpired, errors, children, loading, backButtonEnabled }) => {
     const bottomSheetRef = useRef(null);
+    const [ bottomSheetVisible, setBottomSheetVisible ] = useState(false);
 
     let [fontsLoaded] = useFonts({
         WorkSans_800ExtraBold
@@ -24,6 +25,7 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
     useEffect(() => {
         if (bottomSheetRef?.current) {
             bottomSheetRef.current.close();
+            onBottomSheetClose();
         }
     }, [bottomSheetRef?.current]);
 
@@ -33,6 +35,14 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
         } else {
             return children;
         }
+    }
+
+    const onBottomSheetOpen = () => {
+        setBottomSheetVisible(true);
+    }
+
+    const onBottomSheetClose = () => {
+        setBottomSheetVisible(false);
     }
 
     return (
@@ -47,6 +57,8 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
                             fontsLoaded={ fontsLoaded }
                             community={ community }
                             bottomSheet={ bottomSheetRef }
+                            onBottomSheetOpen={ () => onBottomSheetOpen() }
+                            onBottomSheetClose={ () => onBottomSheetClose() }
                             backButtonEnabled={ backButtonEnabled }
                             navigation={ navigation }
                         />
@@ -62,7 +74,9 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
                             snapPoints={['95%']}>
                                 <CommunityEnrollment
                                     navigation={ navigation }
-                                    renderAsBottomSheet={ true } />
+                                    renderAsBottomSheet={ true }
+                                    visible={ bottomSheetVisible }
+                                />
                         </BottomSheet>
                     </View>
                 </ SafeAreaProvider>

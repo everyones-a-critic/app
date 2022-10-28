@@ -10,27 +10,28 @@ import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 import { pickBarStyle } from "../../utils";
 
 
-const CommunityHeader = ({ community, bottomSheet, fontsLoaded, backButtonEnabled, navigation }) => {
+const CommunityHeader = props => {
     const insets = useSafeAreaInsets();
 
     const navigateToCommunityEnrollment = () => {
-        bottomSheet.current.expand(0);
+        props.bottomSheet.current.expand(0);
+        props.onBottomSheetOpen();
     }
 
     let primaryColor = '#000000';
     let secondaryColor = '#FFFFFF';
     let iconName = 'gears';
-    if (community !== undefined && community !== null) {
-        primaryColor = `#${community.primary_color}`;
-        secondaryColor = `#${community.secondary_color}`;
-        iconName = community.icon;
+    if (props.community !== undefined && props.community !== null) {
+        primaryColor = `#${props.community.primary_color}`;
+        secondaryColor = `#${props.community.secondary_color}`;
+        iconName = props.community.icon;
     }
 
     const renderBackButton = () => {
-        if (backButtonEnabled && navigation.canGoBack()) {
+        if (props.backButtonEnabled && props.navigation.canGoBack()) {
             return (
                 <View style={{ width: '17%', alignItems: 'center' }}>
-                    <Pressable onPress={ () => navigation.goBack() }>
+                    <Pressable onPress={ () => props.navigation.goBack() }>
                         <FontAwesomeIcon
                             color={ secondaryColor } size={ 25 }
                             icon={ findIconDefinition({prefix: 'fas', iconName: 'angle-left' }) } />
@@ -41,7 +42,7 @@ const CommunityHeader = ({ community, bottomSheet, fontsLoaded, backButtonEnable
     }
 
     const renderHeader = () => {
-        if (fontsLoaded) {
+        if (props.fontsLoaded) {
             return (
                 <React.Fragment>
                     { renderBackButton() }
@@ -55,7 +56,7 @@ const CommunityHeader = ({ community, bottomSheet, fontsLoaded, backButtonEnable
                         <Text
                             accessibilityRole="header"
                             style = {[ styles.headerText, { color: secondaryColor }]}>
-                                { community?.name }
+                                { props.community?.name }
                         </Text>
                         <Text style={{ marginTop: 5 }}>
                             <FontAwesomeIcon

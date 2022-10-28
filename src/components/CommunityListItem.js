@@ -31,6 +31,13 @@ const CommunityListItem = props => {
         };
     }, []);
 
+    useEffect(() => {
+        if (!props.visible) {
+            setDisabled(false);
+            setIsMounted(false);
+        }
+    }, [ props.visible ]);
+
     const renderDeleteButton = (progress) => {
         const trans = progress.interpolate({
             inputRange: [0, 1],

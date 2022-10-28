@@ -98,6 +98,7 @@ class CommunityEnrollment extends React.Component {
                     return (
                         <CommunityListItem
                             key={ item.id }
+                            visible={ this.props.visible }
                             community={ item }
                             itemType={ itemType }
                             navigation={ this.props.navigation }/>
@@ -173,7 +174,8 @@ class CommunityEnrollment extends React.Component {
 }
 
 CommunityEnrollment.defaultProps = {
-	renderAsBottomSheet: false
+	renderAsBottomSheet: false,
+	visible: true
 };
 
 const styles = StyleSheet.create({
