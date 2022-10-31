@@ -125,7 +125,7 @@ class AccountManagementPage extends React.Component {
                             style={{ flex: 1, backgroundColor: YELLOW }}
                         >
                             <View style={{ height: insets.top, backgroundColor: YELLOW }}>
-                                <StatusBar hidden={false} backgroundColor={ YELLOW } barStyle={ 'light-content' } />
+                                <StatusBar hidden={false} backgroundColor={ YELLOW } barStyle={ 'dark-content' } />
                             </View>
                             <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={ styles.container }>
                                 <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />

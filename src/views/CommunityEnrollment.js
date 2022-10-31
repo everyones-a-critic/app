@@ -125,7 +125,7 @@ class CommunityEnrollment extends React.Component {
         if (!this.props.renderAsBottomSheet) {
             return (
                 <View style={{ height: insets.top, backgroundColor: YELLOW }}>
-                    <StatusBar backgroundColor={ YELLOW } barStyle={ 'light-content' } />
+                    <StatusBar backgroundColor={ YELLOW } barStyle={ 'dark-content' } />
                 </View>
             )
         }

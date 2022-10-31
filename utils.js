@@ -29,7 +29,7 @@ export const pickBarStyle = (bgColor) => {
     });
     var L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
 
-    return (L > 0.179) ? 'light-content' : 'dark-content';
+    return (L > 0.179) ? 'dark-content' : 'light-content';
 };
 
 export const hexToRGB = hexColor => {
