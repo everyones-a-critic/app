@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 
 import AccountManagementPage from "../components/AccountManagementPage";
 import InputSet from '../components/InputSet';
-import { signIn, sendConfirmationCode } from "../features/account/accountSlice";
+import { signIn, sendConfirmationCode, resetErrors } from "../features/account/accountSlice";
 import { concatErrors } from "../../utils";
 
 
@@ -38,16 +38,22 @@ class SignIn extends React.Component {
         this.props.navigation.navigate('Sign Up');
     }
 
+    componentDidMount = () => {
+        this.props.resetErrors()
+    }
+
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded'){
             if (!this.props.confirmed) {
                 this.props.sendConfirmationCode();
                 this.props.navigation.navigate('Confirm Account', { email: this.state.email });
-            } else {
-                const next = this.props.route.params?.next || 'Community Enrollment';
-                const nextParams = this.props.route.params?.nextParams || {};
-                this.props.navigation.navigate(next, nextParams);
             }
+        }
+
+        if (this.props.loggedIn) {
+            const next = this.props.route.params?.next || 'Community Enrollment';
+            const nextParams = this.props.route.params?.nextParams || {};
+            this.props.navigation.navigate(next, nextParams);
         }
     }
 
@@ -120,7 +126,8 @@ const mapStateToProps = state => {
         errors: state.account.errors,
         requestStatus: state.account.requestStatus,
         confirmed: state.account.confirmed,
+        loggedIn: state.account.loggedIn,
     };
 };
 
-export default connect(mapStateToProps, { signIn, sendConfirmationCode })(SignIn);
+export default connect(mapStateToProps, { signIn, sendConfirmationCode, resetErrors })(SignIn);
