@@ -46,9 +46,11 @@ const CommunityHome = (props) => {
         return (
             <FlatList
                 removeClippedSubviews
+                maxToRenderPerBatch={ 4 }
+                initialNumToRender={ 2 }
+                windowSize={ 6 }
                 showsVerticalScrollIndicator={ false }
                 data={ data }
-                initialNumToRender={ 2 }
                 refreshing= { props.productsLoading }
                 renderItem={ ({item}) => <ProductCard key={ item.id } navigation={ props.navigation } product={ item } fields={ community?.primary_fields }/> }
                 keyExtractor={ item => item.id }
