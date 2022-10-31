@@ -144,11 +144,13 @@ export const productsSlice = createSlice({
             const communityId = action.payload.communityId
             const productId = action.payload.productId
             let productList = state.allWithRatingsByCommunity[communityId];
-            for (let i = 0; i < state.allByCommunity[communityId].length; i++) {
-                const product = state.allByCommunity[communityId][i];
-                if (product.id === productId) {
-                    productList.push(Object.assign({ rating: action.payload.rating }, product));
-                    break;
+            if (productList) {
+                for (let i = 0; i < state.allByCommunity[communityId].length; i++) {
+                    const product = state.allByCommunity[communityId][i];
+                    if (product.id === productId) {
+                        productList.unshift(Object.assign({ rating: action.payload.rating }, product));
+                        break;
+                    }
                 }
             }
             state.allWithRatingsByCommunity[communityId] = productList;
