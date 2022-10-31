@@ -38,6 +38,8 @@ test('When password is invalid', async () => {
     fireEvent.changeText(emailInput, 'test@test.com')
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test')
 
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
@@ -55,10 +57,29 @@ test('When password is empty', async () => {
     });
 });
 
+test("When passwords don't match", async () => {
+    const screen = render(<Provider store={store}><SignUp /></Provider>);
+    const emailInput = screen.getByLabelText("Email Entry");
+    fireEvent.changeText(emailInput, 'test@test.com');
+
+    const passwordInput = screen.getByLabelText("Password Entry")
+    fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test2')
+
+    fireEvent.press(screen.getByText("Sign Up"));
+    await waitFor(() => {
+        expect(screen.getByRole("alert")).toHaveTextContent("Password and password confirmation do not match")
+    });
+});
+
 test('When email is empty', async () => {
     const screen = render(<Provider store={store}><SignUp /></Provider>);
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test')
+
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
         expect(screen.getByRole("alert")).toHaveTextContent("Email is required")
@@ -75,6 +96,8 @@ test('When email is already registered', async () => {
     fireEvent.changeText(emailInput, 'test@test.com')
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test')
 
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
@@ -92,6 +115,8 @@ test('When email is invalid', async () => {
     fireEvent.changeText(emailInput, 'test')
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test')
 
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {
@@ -116,6 +141,8 @@ test('When sign up is successful, user is redirected to Confirm Page', async () 
     fireEvent.changeText(emailInput, 'test@test.com')
     const passwordInput = screen.getByLabelText("Password Entry")
     fireEvent.changeText(passwordInput, 'test')
+    const confirmPasswordInput = screen.getByLabelText("Confirm Password Entry")
+    fireEvent.changeText(confirmPasswordInput, 'test')
 
     fireEvent.press(screen.getByText("Sign Up"));
     await waitFor(() => {

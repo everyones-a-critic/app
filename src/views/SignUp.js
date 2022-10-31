@@ -4,7 +4,7 @@ setupURLPolyfill();
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { signUp } from "../features/account/accountSlice";
+import { signUp, resetErrors } from "../features/account/accountSlice";
 
 import AccountManagementPage from "../components/AccountManagementPage";
 import InputSet from '../components/InputSet';
@@ -15,6 +15,7 @@ class SignUp extends React.Component {
     state = {
         email: null,
         password: null,
+        passwordConfirmation: null,
         customPasswordError: null,
         customEmailError: null,
     };
@@ -30,12 +31,20 @@ class SignUp extends React.Component {
         if (this.state.password === null || this.state.password === "") {
             this.setState({customPasswordError: 'Password is required'});
             isValid = false;
+        } else if (this.state.password !== this.state.passwordConfirmation) {
+            this.setState({customPasswordError: 'Password and password confirmation do not match'});
+            isValid = false;
         }
+
         return isValid;
     }
 
     navigateToSignInPage = () => {
         this.props.navigation.navigate('Sign In');
+    }
+
+    componentDidMount = () => {
+        this.props.resetErrors()
     }
 
     componentDidUpdate(prevProps){
@@ -70,8 +79,18 @@ class SignUp extends React.Component {
                 />
                 <InputSet
                     label="Password"
-                    errors={ concatErrors(this.props.errors.fields.password, this.state.customPasswordError) }
                     onChangeText={(text) => this.setState({password: text})}
+                    options={{
+                        secureTextEntry: true,
+                        autoComplete: "password-new",
+                        textContentType: "newPassword",
+                        passwordRules: "minlength: 8; required: lower; required: upper; required: digit; required: [-];",
+                    }}
+                />
+                <InputSet
+                    label="Confirm Password"
+                    errors={ concatErrors(this.props.errors.fields.password, this.state.customPasswordError) }
+                    onChangeText={(text) => this.setState({passwordConfirmation: text})}
                     options={{
                         secureTextEntry: true,
                         autoComplete: "password-new",
@@ -91,4 +110,4 @@ const mapStateToProps = state => {
     };
 };
 
-export default connect(mapStateToProps, { signUp })(SignUp);
+export default connect(mapStateToProps, { signUp, resetErrors })(SignUp);

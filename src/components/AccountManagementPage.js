@@ -122,15 +122,12 @@ class AccountManagementPage extends React.Component {
                     { insets => <Loader loading={ this.state.webRequestInProgress }>
                         <KeyboardAvoidingView
                             behavior={ Platform.OS === "ios" ? "padding" : "height" }
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, backgroundColor: YELLOW }}
                         >
                             <View style={{ height: insets.top, backgroundColor: YELLOW }}>
                                 <StatusBar hidden={false} backgroundColor={ YELLOW } barStyle={ 'light-content' } />
                             </View>
-                            <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={[
-                                styles.container,
-                                { minHeight: this.state.keyboardVisible ? "100%" : this.state.dimensions.screen.height - insets.top }
-                            ]}>
+                            <ScrollView keyboardShouldPersistTaps={ 'handled' } contentContainerStyle={ styles.container }>
                                 <Image style={[styles.image, styles.flexbox]} source={require('../../assets/horizontalLogo.png')} />
                                 <View style={[
                                     styles.flexbox,
@@ -178,7 +175,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         backgroundColor: YELLOW,
         fontFamily: 'Helvetica Neue',
-        paddingBottom: 35
+        paddingBottom: 35,
+        flex: 1,
+        minHeight: 500
     },
     image: {
         resizeMode: 'contain',
