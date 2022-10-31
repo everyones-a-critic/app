@@ -27,19 +27,19 @@ const App = () => {
                     <Stack.Navigator>
                         <Stack.Screen name="Splash Screen"
                                       component={ SplashScreen }
-                                      options={{ headerShown: false }} />
+                                      options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Sign Up"
                                       component={ SignUp }
-                                      options={{ headerShown: false }} />
+                                      options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Sign In"
                                       component={ SignIn }
-                                      options={{ headerShown: false }} />
+                                      options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Confirm Account"
                                       component={ ConfirmAccount }
-                                      options={{ headerShown: false }} />
+                                      options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Community Enrollment"
                                       component={ CommunityEnrollment }
-                                      options={{ headerShown: false }} />
+                                      options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Community Home"
                                       component={ CommunityHome }
                                       options={{ headerShown: false, gestureEnabled: false }} />
