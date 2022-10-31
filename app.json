@@ -16,7 +16,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "1.0.3",
+      "buildNumber": "5",
       "supportsTablet": true,
       "bundleIdentifier": "com.everyonesacriticapp"
     },
