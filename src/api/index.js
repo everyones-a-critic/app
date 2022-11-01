@@ -6,6 +6,10 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 
 
+const sleep = ms => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const api = axios.create({
 	baseURL: 'https://api.everyonesacriticapp.com',
 });
@@ -84,6 +88,7 @@ api.interceptors.response.use(response => response, async error => {
         if (error.config.headers.retries === 0) {
             console.log("hitting retry")
             error.config.headers.retries = 1;
+            await sleep(1000);
             return await api.request(error.config);
         } else {
             console.log("retried once. returning")
