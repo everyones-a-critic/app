@@ -13,12 +13,15 @@ import EditRating from  "./EditRating";
 import { LIGHTGRAY } from "../settings/colors";
 
 const windowHeight = Dimensions.get("window").height;
-const SCROLL_LOCK_POSITION = 250;
 const ProductHome = (props) => {
     const [ scrollEnabled, setScrollEnabled ] = useState(true);
     const [ bottomSheetVisible, setBottomSheetVisible ] = useState(false);
+    const [ scrollLockPosition, setScrollLockPosition ] = useState(0);
+    const [ bottomSheetPosition, setBottomSheetPosition ] = useState(0);
+
     const bottomSheet = useRef(null);
     const scrollComponent = useRef(null);
+    const imageComponent = useRef(null);
 
     useEffect(() => {
         props.getProduct({ id: props.route.params.productId });
@@ -29,7 +32,7 @@ const ProductHome = (props) => {
     const openRatingSheet = () => {
         window.setTimeout(() => {
             scrollComponent.current.scrollTo({
-                y: SCROLL_LOCK_POSITION, animated: true
+                y: scrollLockPosition, animated: true
             });
             bottomSheet.current.snapToIndex(0);
             setBottomSheetVisible(true);
@@ -45,10 +48,19 @@ const ProductHome = (props) => {
 
     const onBottomSheetReposition = isClosed => {
         if (isClosed) {
-//             closeRatingSheet();
             setScrollEnabled(true);
             setBottomSheetVisible(false);
         }
+    }
+
+    const handleImageLayoutChange = event => {
+        const layout = event.nativeEvent.layout;
+        setScrollLockPosition(layout.y + layout.height)
+    }
+
+    const handleRatingBoxLayoutChange = event => {
+        const layout = event.nativeEvent.layout;
+        setBottomSheetPosition(layout.y)
     }
 
     const renderProductInfo = () => {
@@ -59,6 +71,8 @@ const ProductHome = (props) => {
                 <React.Fragment>
                     <View style={ styles.imageContainer }>
                         <Image
+                            onLayout={ event => handleImageLayoutChange(event) }
+                            ref={ imageComponent }
                             resizeMode='center'
                             accessibilityLabel={`Image of ${product.name}`}
                             style={ styles.image }
@@ -84,7 +98,7 @@ const ProductHome = (props) => {
                         navigation={ props.navigation }
                         community= { props.community }
                         product={ product } />
-                    <View style={ styles.fieldContainer }>
+                    <View style={ styles.fieldContainer } onLayout={ handleRatingBoxLayoutChange }>
                         <FieldSet
                             style={{ fontSize: 20 }}
                             fields={ props.community.primary_fields }
@@ -116,7 +130,7 @@ const ProductHome = (props) => {
                     enablePanDownToClose
                     ref={ bottomSheet }
                     index={ -1 }
-                    snapPoints={[windowHeight - 250, windowHeight - 25]}
+                    snapPoints={[windowHeight - bottomSheetPosition + scrollLockPosition, windowHeight - 15 ]}
                     onChange={ posIndex => onBottomSheetReposition(posIndex === -1) }
                     handleIndicatorStyle = {{ backgroundColor: `#${community.secondary_color}` }}
                 >
@@ -145,7 +159,7 @@ const ProductHome = (props) => {
         >
             <ScrollView
                 scrollEnabled={ scrollEnabled }
-                contentContainerStyle= {{ paddingBottom: 90, minHeight: 950 }}
+                contentContainerStyle= {{ paddingBottom: 90, minHeight: windowHeight + scrollLockPosition }}
                 ref={ scrollComponent }
             >
                 { renderProductInfo() }
