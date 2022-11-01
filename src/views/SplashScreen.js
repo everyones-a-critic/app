@@ -195,17 +195,19 @@ const SplashScreen = props => {
     } else {
         const staticBackgroundColor = page === "secondary" ? `#${props.community?.primary_color || "#000000"}` : YELLOW;
         return (
-            <View style={styles.container}>
-                <View style={{ height: insets.top }}>
-                    <StatusBar hidden={ true }/>
-                </View>
-                <Animated.View style={{...styles.container, backgroundColor: backgroundColor }}>
-                    <Animated.Text style={[ styles.title, { color: textColor, opacity: mainHeaderOpacity }]}>Everyone's a</Animated.Text>
-                    <Animated.Text style={[ styles.title, { color: textColor, fontSize: secondaryHeaderFontSize, opacity: secondaryHeaderOpacity }]}>{ props.community?.name }</Animated.Text>
-                    { renderIcon() }
-                    <Animated.Text style={[styles.title, { color: textColor, opacity: mainHeaderOpacity }]}>Critic</Animated.Text>
+            <React.Fragment>
+                <Animated.View style={{ height: insets.top, backgroundColor: backgroundColor }}>
+                    <StatusBar hidden={ false } barStyle={ pickBarStyle(staticBackgroundColor) } />
                 </Animated.View>
+                <View style={styles.container}>
+                    <Animated.View style={{...styles.container, backgroundColor: backgroundColor }}>
+                        <Animated.Text style={[ styles.title, { color: textColor, opacity: mainHeaderOpacity }]}>Everyone's a</Animated.Text>
+                        <Animated.Text style={[ styles.title, { color: textColor, fontSize: secondaryHeaderFontSize, opacity: secondaryHeaderOpacity }]}>{ props.community?.name }</Animated.Text>
+                        { renderIcon() }
+                        <Animated.Text style={[styles.title, { color: textColor, opacity: mainHeaderOpacity }]}>Critic</Animated.Text>
+                    </Animated.View>
             </View>
+            </React.Fragment>
         );
     }
 }
