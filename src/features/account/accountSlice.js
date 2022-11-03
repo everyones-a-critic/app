@@ -11,12 +11,11 @@ import { Buffer } from 'buffer/';
 
 
 export const signUp = createAsyncThunk('account/signUp', async formData => {
-    const email = formData.email.trim();
+    const email = formData.email.trim().toLowerCase();
     const input = {
         ClientId: process.env.COGNITO_CLIENT_ID,
         UserPoolId: process.env.COGNITO_USER_POOL_ID,
-        // Password: formData.password,
-        Password: "Test1234%",
+        Password: formData.password,
         Username: email,
         UserAttributes: [
             { Name: "email", Value: email }
@@ -55,7 +54,7 @@ export const signUp = createAsyncThunk('account/signUp', async formData => {
 });
 
 export const confirm = createAsyncThunk('account/confirm', async formData => {
-    const email = formData.email.trim();
+    const email = formData.email.trim().toLowerCase();
     const input = {
         ClientId: process.env.COGNITO_CLIENT_ID,
         UserPoolId: process.env.COGNITO_USER_POOL_ID,
@@ -84,7 +83,7 @@ export const confirm = createAsyncThunk('account/confirm', async formData => {
 });
 
 export const signIn = createAsyncThunk('account/signIn', async formData => {
-    const email = formData.email.trim()
+    const email = formData.email.trim().toLowerCase()
     const input = {
         ClientId: process.env.COGNITO_CLIENT_ID,
         UserPoolId: process.env.COGNITO_USER_POOL_ID,
