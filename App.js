@@ -15,6 +15,12 @@ import ProductHome from "./src/views/ProductHome";
 import SplashScreen from "./src/views/SplashScreen";
 
 import { FocusedElementContext } from "./src/context/focusedElement";
+import * as Sentry from 'sentry-expo';
+
+Sentry.init({
+  dsn: "https://c6aa256447a34942a16d0bab51528978@o4504095672696832.ingest.sentry.io/4504095674138624",
+  enableInExpoDevelopment: true
+});
 
 
 const App = () => {

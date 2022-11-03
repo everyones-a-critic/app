@@ -16,7 +16,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "7",
+      "buildNumber": "9",
       "supportsTablet": true,
       "bundleIdentifier": "com.everyonesacriticapp"
     },
@@ -33,6 +33,14 @@
       "eas": {
         "projectId": "829b5e48-10fc-4205-a95b-9bbe24f6dbda"
       }
-    }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps"
+        }
+      ]
+    },
+    "plugins": ["sentry-expo"]
   }
 }
