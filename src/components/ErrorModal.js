@@ -7,6 +7,8 @@ export default ({ errors }) => {
     useEffect(() => {
 		if (errors !== undefined && errors.length > 0) {
             setVisible(true);
+        } else {
+            setVisible(false);
         }
     }, [errors]);
 
