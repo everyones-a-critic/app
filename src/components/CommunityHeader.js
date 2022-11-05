@@ -1,18 +1,16 @@
 import React from 'react';
-import { Text, View, StyleSheet, Pressable, StatusBar } from "react-native";
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text, View, StyleSheet, Pressable } from "react-native";
 
 import { WorkSans_800ExtraBold } from '@expo-google-fonts/work-sans';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
+import Header from "./Header";
 import { pickBarStyle } from "../../utils";
 
 
 const CommunityHeader = props => {
-    const insets = useSafeAreaInsets();
-
     const navigateToCommunityEnrollment = () => {
         props.bottomSheet.current.expand(0);
         props.onBottomSheetOpen();
@@ -27,25 +25,10 @@ const CommunityHeader = props => {
         iconName = props.community.icon;
     }
 
-    const renderBackButton = () => {
-        if (props.backButtonEnabled && props.navigation.canGoBack()) {
-            return (
-                <View style={{ width: '17%', alignItems: 'center' }}>
-                    <Pressable onPress={ () => props.navigation.goBack() }>
-                        <FontAwesomeIcon
-                            color={ secondaryColor } size={ 25 }
-                            icon={ findIconDefinition({prefix: 'fas', iconName: 'angle-left' }) } />
-                    </Pressable>
-                </View>
-            )
-        }
-    }
-
     const renderHeader = () => {
         if (props.fontsLoaded) {
             return (
                 <React.Fragment>
-                    { renderBackButton() }
                     <Pressable
                         accessibilityRole="link"
                         accessibilityLabel="Change Community"
@@ -77,14 +60,16 @@ const CommunityHeader = props => {
     }
 
     return (
-        <React.Fragment>
-            <View style={{ height: insets.top, backgroundColor: primaryColor }}>
-                <StatusBar hidden={ false } backgroundColor={ primaryColor } barStyle={ pickBarStyle(primaryColor) } />
-            </View>
-            <View style={[ styles.header, { backgroundColor: primaryColor }]}>
-                { renderHeader() }
-            </View>
-        </React.Fragment>
+        <Header
+            headerStyle={{ justifyContent: 'flex-end' }}
+            primaryColor={ primaryColor }
+            secondaryColor={ secondaryColor }
+            backButtonEnabled={ props.backButtonEnabled }
+            navigation={ props.navigation }
+            fontsLoaded={ props.fontsLoaded }
+        >
+            { renderHeader() }
+        </Header>
     );
 }
 
