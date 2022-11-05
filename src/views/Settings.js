@@ -1,21 +1,24 @@
 import React from 'react';
 import { Text, View, StyleSheet, Pressable } from "react-native";
+import { connect } from "react-redux";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
+import { signOut } from "../features/account/accountSlice";
 import Header from '../components/Header';
 import SettingsRow from '../components/SettingsRow';
 import { YELLOW, SUPER_LIGHT_GRAY, LIGHT_GRAY } from '../settings/colors';
 
 const Settings = props => {
-    const logout = () => {
-
+    const logout = async () => {
+        await props.signOut();
+        props.navigation.navigate('Sign In', params={ customMessage: "You've been successfully logged out."})
     }
 
     const deleteAccount = () => {
-
+        props.navigation.navigate('Delete Account')
     }
 
     return (
@@ -62,4 +65,8 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Settings;
+const mapStateToProps = state => {
+    return {}
+}
+
+export default connect(mapStateToProps, { signOut })(Settings);

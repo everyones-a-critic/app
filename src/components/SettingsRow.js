@@ -11,7 +11,11 @@ import { YELLOW, SUPER_LIGHT_GRAY, LIGHT_GRAY } from '../settings/colors';
 const SettingsRow = props => {
 
     return (
-        <Pressable onPress={ props.onPress } style={[ styles.row ]}>
+        <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={ props.title }
+            onPress={ props.onPress } style={[ styles.row ]}
+        >
             <View style={ styles.iconContainer }>
                 <FontAwesomeIcon
                     color={ props.iconColor } size={ 25 }

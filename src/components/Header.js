@@ -27,8 +27,10 @@ const Header = props => {
             let onPressFunc;
             if (props.navigation.canGoBack()) {
                 onPressFunc = props.navigation.goBack;
-            } else if (props.backButtonDefault !== null) {
+            } else if (props.backButtonDefault !== null && props.backButtonDefault !== undefined) {
                 onPressFunc = props.backButtonDefault;
+            } else {
+                return <View style={{ width: '17%', alignItems: 'center' }} />;
             }
 
             return (
