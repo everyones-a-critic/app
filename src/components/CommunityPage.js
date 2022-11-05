@@ -26,6 +26,14 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
         WorkSans_800ExtraBold
     });
 
+    // when we switch communities, close the community enrollment bottom sheet
+    useEffect(() => {
+        if (bottomSheetRef?.current) {
+            bottomSheetRef.current.close();
+            onBottomSheetClose();
+        }
+    }, [route?.params]);
+
     renderChildren = () => {
         if (community === undefined || community === null) {
             return null;
