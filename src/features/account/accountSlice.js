@@ -6,7 +6,7 @@ import {
     InitiateAuthCommand,
     ResendConfirmationCodeCommand
 } from "@aws-sdk/client-cognito-identity-provider";
-import { setItemAsync, getItemAsync } from 'expo-secure-store';
+import { setItemAsync, getItemAsync, deleteItemAsync } from 'expo-secure-store';
 import { Buffer } from 'buffer/';
 
 
@@ -164,6 +164,7 @@ export const sendConfirmationCode = createAsyncThunk('account/sendConfirmationCo
 });
 
 export const signOut = createAsyncThunk('account/signOut', async () => {
+    console.log("signOut")
     await deleteItemAsync("IdentityToken");
     await deleteItemAsync("RefreshToken");
 
