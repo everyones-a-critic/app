@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, Image, View, TextInput, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { connect } from "react-redux";
-import { LIGHTGRAY } from "../settings/colors";
+import { LIGHT_GRAY } from "../settings/colors";
 
 import PillBox from  "../components/PillBox";
 import AuthenticationProvider from  "../components/AuthenticationProvider";
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         fontSize: 16,
         borderWidth: 1,
-        borderColor: LIGHTGRAY,
+        borderColor: LIGHT_GRAY,
         height: 150,
 
     }

@@ -10,8 +10,9 @@ import { useFonts, WorkSans_800ExtraBold } from '@expo-google-fonts/work-sans';
 import CommunityEnrollment from  "../views/CommunityEnrollment";
 import AuthenticationProvider from "./AuthenticationProvider";
 import CommunityHeader from "./CommunityHeader";
+import CommunityFooter from "./CommunityFooter";
 import ErrorModal from "./ErrorModal";
-import { YELLOW, GRAY } from "../settings/colors";
+import { YELLOW, GRAY, SUPER_LIGHT_GRAY } from "../settings/colors";
 
 
 const CommunityPage = ({ community, navigation, route, authExpired, errors, children, loading, backButtonEnabled }) => {
@@ -62,9 +63,16 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
                             backButtonEnabled={ backButtonEnabled }
                             navigation={ navigation }
                         />
-                        <View style={{ backgroundColor: "#F2F2F2" }}>
+                        <View style={{ flex: 1, backgroundColor: SUPER_LIGHT_GRAY }}>
                             { renderChildren() }
                         </View>
+                        <CommunityFooter
+                            community={ community }
+                            bottomSheet={ bottomSheetRef }
+                            onBottomSheetOpen={ () => onBottomSheetOpen() }
+                            onBottomSheetClose={ () => onBottomSheetClose() }
+                            navigation={ navigation }
+                        />
                         <ErrorModal errors={ errors }/>
                         <BottomSheet
                             backgroundStyle={{ backgroundColor: YELLOW }}

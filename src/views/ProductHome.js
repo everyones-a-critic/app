@@ -10,7 +10,7 @@ import CommunityPage from  "../components/CommunityPage";
 import RatingBox from  "../components/RatingBox";
 import FieldSet from  "../components/FieldSet";
 import EditRating from  "./EditRating";
-import { LIGHTGRAY } from "../settings/colors";
+import { LIGHT_GRAY } from "../settings/colors";
 
 const windowHeight = Dimensions.get("window").height;
 const ProductHome = (props) => {
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         paddingTop: 25,
         paddingBottom: 30,
         borderBottomWidth: 1,
-        borderColor: LIGHTGRAY,
+        borderColor: LIGHT_GRAY,
     },
     fieldContainer: {
         paddingTop: 30,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         borderBottomWidth: 1,
-        borderColor: LIGHTGRAY,
+        borderColor: LIGHT_GRAY,
     }
 });
 

@@ -9,7 +9,7 @@ import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 import AuthenticationProvider from "./AuthenticationProvider";
 import { createOrUpdateRating, archiveRating } from "../features/ratings/ratingsSlice";
 import { removeRatingFromProduct, addRatingToProduct } from "../features/products/productsSlice";
-import { GRAY, LIGHTGRAY } from "../settings/colors";
+import { GRAY } from "../settings/colors";
 
 
 const RatingIcon = (props) => {
