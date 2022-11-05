@@ -23,13 +23,6 @@ const CommunityPage = ({ community, navigation, route, authExpired, errors, chil
         WorkSans_800ExtraBold
     });
 
-    useEffect(() => {
-        if (bottomSheetRef?.current) {
-            bottomSheetRef.current.close();
-            onBottomSheetClose();
-        }
-    }, [bottomSheetRef?.current]);
-
     renderChildren = () => {
         if (community === undefined || community === null) {
             return null;
