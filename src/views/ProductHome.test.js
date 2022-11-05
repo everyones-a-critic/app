@@ -21,6 +21,7 @@ import { mockReturnValues } from '../../testing/apiMockResources';
 
 import ProductHome from './ProductHome';
 import SignIn from './SignIn';
+import CommunityHome from './CommunityHome';
 
 
 let store;
@@ -89,6 +90,10 @@ const renderView = async () => {
                         <Stack.Screen
                             name="Sign In"
                             component={ SignIn }
+                            options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="Community Home"
+                            component={ CommunityHome }
                             options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
@@ -237,4 +242,14 @@ test('when comments are added, patch is sent to api', async () => {
     expect(axios.patch).toHaveBeenCalledWith("/products/1/ratings/1/", {
         comments: "hi there.",
     });
+});
+
+test('When footer community home link is pressed, user is navigated to CommunityHome', async () => {
+    const screen = await renderView();
+    await act(async() => {
+        fireEvent(screen.getByLabelText('Community Home Link'), 'Press');
+    });
+
+    const communityHomeIdentifier = await screen.getByText('Browse');
+    expect(communityHomeIdentifier).toBeTruthy();
 });

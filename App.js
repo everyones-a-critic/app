@@ -13,6 +13,7 @@ import CommunityEnrollment from "./src/views/CommunityEnrollment";
 import CommunityHome from "./src/views/CommunityHome";
 import ProductHome from "./src/views/ProductHome";
 import SplashScreen from "./src/views/SplashScreen";
+import Settings from "./src/views/Settings";
 
 import { FocusedElementContext } from "./src/context/focusedElement";
 import * as Sentry from 'sentry-expo';
@@ -51,6 +52,9 @@ const App = () => {
                                       options={{ headerShown: false, gestureEnabled: false }} />
                         <Stack.Screen name="Product Home"
                                       component={ ProductHome }
+                                      options={{ headerShown: false }} />
+                        <Stack.Screen name="Settings"
+                                      component={ Settings }
                                       options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </FocusedElementContext.Provider>

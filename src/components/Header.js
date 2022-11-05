@@ -48,7 +48,6 @@ const Header = props => {
     const renderHeader = () => {
         if (props.title !== null) {
             if (fontsLoaded) {
-                console.log("1")
                 return (
                     <React.Fragment>
                         { renderBackButton() }

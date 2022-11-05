@@ -20,6 +20,7 @@ import ratingsReducer from "../features/ratings/ratingsSlice";
 import CommunityHome from './CommunityHome';
 import ProductHome from './ProductHome';
 import SignIn from './SignIn';
+import Settings from './Settings';
 
 
 let store;
@@ -60,6 +61,7 @@ const renderCommunityHomeComponent = async () => {
                             options={{ headerShown: false }} />
                         <Stack.Screen name="Product Home" component={ ProductHome } options={{ headerShown: false }} />
                         <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
+                        <Stack.Screen name="Settings" component={ Settings } options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
             </Provider>
@@ -127,4 +129,25 @@ test('products with ratings should load', async() => {
         priceElements = await screen.findAllByText('$30 for 10 servings');
     });
     expect(priceElements.length).toEqual(2);
+});
+
+describe('Header', () => {
+    test('switch communities link renders bottom sheet', async () => {
+        const screen = await renderCommunityHomeComponent();
+        await act(async() => await fireEvent(screen.getByLabelText("Community Enrollment Link"), 'Press'));
+
+        let communityEnrollmentIdentifier;
+        await act(async() => {
+            communityEnrollmentIdentifier = await screen.getByText('Communities');
+        });
+        expect(communityEnrollmentIdentifier).toBeTruthy();
+    });
+
+    test('account link navigates to settings page', async () => {
+        const screen = await renderCommunityHomeComponent();
+        await act(async() => await fireEvent(screen.getByLabelText("Account Settings Link"), 'Press'));
+
+        const settingsIdentifier = await screen.getByText('Settings');
+        expect(settingsIdentifier).toBeTruthy();
+    });
 });
