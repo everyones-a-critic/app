@@ -29,7 +29,7 @@ const CommunityHome = (props) => {
         setItemAsync('MostRecentCommunityId', props.route.params.communityId);
         props.getCommunity({ id: props.route.params.communityId });
         getMoreProducts();
-    }, [ communityId, selectedProductList ]);
+    }, [ props.route.params.communityId, selectedProductList ]);
 
     const renderProductList = () => {
         const data = selectedProductList === "Browse" ? props.allProducts : props.productsWithRatings
@@ -140,7 +140,7 @@ const mapStateToProps = state => {
             return true;
         }
 
-        if (state.communities.getOneRequestMetadata.status == 'expiredAuth') {
+        if (state.communities.getOneRequestMetadata.status === 'expiredAuth') {
             return true;
         }
 
