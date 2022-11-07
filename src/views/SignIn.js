@@ -43,17 +43,15 @@ class SignIn extends React.Component {
     }
 
     componentDidUpdate = (prevProps, prevState, snapshot) => {
-        if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded'){
+        if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded' && this.props.loggedIn){
             if (!this.props.confirmed) {
                 this.props.sendConfirmationCode();
                 this.props.navigation.navigate('Confirm Account', { email: this.state.email });
+            } else {
+                const next = this.props.route.params?.next || 'Community Enrollment';
+                const nextParams = this.props.route.params?.nextParams || {};
+                this.props.navigation.navigate(next, nextParams);
             }
-        }
-
-        if (this.props.loggedIn) {
-            const next = this.props.route.params?.next || 'Community Enrollment';
-            const nextParams = this.props.route.params?.nextParams || {};
-            this.props.navigation.navigate(next, nextParams);
         }
     }
 
