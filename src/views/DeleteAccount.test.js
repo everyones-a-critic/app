@@ -12,7 +12,8 @@ import productsReducer from "../features/products/productsSlice";
 import ratingsReducer from "../features/ratings/ratingsSlice";
 
 import { mockClient } from 'aws-sdk-client-mock';
-import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+import 'aws-sdk-client-mock-jest';
+import { CognitoIdentityProviderClient, DeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
 
 import { deleteItemAsync } from 'expo-secure-store';
@@ -33,29 +34,23 @@ beforeEach(() => {
         }
     });
 
-    cognitoMock.on(InitiateAuthCommand).resolves({
-        AuthenticationResult: {
-            IdToken: "Test AccessToken",
-            RefreshToken: "Test RefreshToken",
-            TokenType: "Bearer"
-        }
-    });
+    cognitoMock.on(DeleteUserCommand).resolves();
 });
 
 afterEach(() => {
     cognitoMock.reset();
 });
 
-const renderSettingsComponent = async () => {
+const renderDeleteAccountComponent = async () => {
     let screen;
     await waitFor(() => {
         screen = render(
             <Provider store={store}>
                 <NavigationContainer>
                     <Stack.Navigator>
+                        <Stack.Screen name="Delete Account" component={ DeleteAccount } options={{ headerShown: false }} />
                         <Stack.Screen name="Settings" component={ Settings } options={{ headerShown: false }} />
                         <Stack.Screen name="Sign In" component={ SignIn } options={{ headerShown: false }} />
-                        <Stack.Screen name="Delete Account" component={ DeleteAccount } options={{ headerShown: false }} />
                     </Stack.Navigator>
                 </NavigationContainer>
             </Provider>
@@ -65,20 +60,22 @@ const renderSettingsComponent = async () => {
     return screen;
 }
 
-test('When logout link is pressed, tokens are removed and user is navigated to signIn', async () => {
-    const screen = await renderSettingsComponent();
-    await waitFor(() => fireEvent.press(screen.getByText("Logout")));
+test('When delete account button is pressed, DeleteUserCommand is called and user is navigated to signIn', async () => {
+    const screen = await renderDeleteAccountComponent();
+    await waitFor(() => fireEvent.press(screen.getByText("Yes - Delete")));
 
-    expect(deleteItemAsync).toHaveBeenCalledWith('RefreshToken');
-    expect(deleteItemAsync).toHaveBeenCalledWith('IdentityToken');
-    expect(screen.getByText("You've been successfully logged out.")).toBeTruthy();
-});
-
-test('When delete account link is pressed, user is navigated to delete account page', async () => {
-    const screen = await renderSettingsComponent();
-    await waitFor(() => fireEvent.press(screen.getByText("Delete Account")));
+    expect(cognitoMock).toHaveReceivedCommand(DeleteUserCommand);
 
     expect(screen.getByText(
-        "Are you sure you want to delete your account and its associated data? This action cannot be undone."
+        "Your user was successfully deleted."
+    )).toBeTruthy();
+});
+
+test('When cancel button is pressed, user is navigated to Settings', async () => {
+    const screen = await renderDeleteAccountComponent();
+    await waitFor(() => fireEvent.press(screen.getByText("No - Cancel")));
+
+    expect(screen.getByText(
+        "Logout"
     )).toBeTruthy();
 });

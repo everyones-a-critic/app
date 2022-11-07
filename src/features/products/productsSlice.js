@@ -94,23 +94,24 @@ export const listMoreProductsWithRatings = createAsyncThunk('products/listWithRa
     }
 });
 
-
+const initialState = {
+    focusedProduct: null,
+    getOneRequestMetadata: {
+        status: 'idle'
+    },
+    all: [],
+    allByCommunity: {},
+    allByCommunityRequestMetadata: {},
+    allWithRatingsByCommunity: {},
+    allWithRatingsByCommunityRequestMetadata: {},
+    errors: [],
+    validSession: true
+}
 export const productsSlice = createSlice({
     name: 'products',
-    initialState: {
-        focusedProduct: null,
-        getOneRequestMetadata: {
-            status: 'idle'
-        },
-        all: [],
-        allByCommunity: {},
-        allByCommunityRequestMetadata: {},
-        allWithRatingsByCommunity: {},
-        allWithRatingsByCommunityRequestMetadata: {},
-        errors: [],
-        validSession: true
-    },
+    initialState: initialState,
     reducers: {
+        reset: () => initialState,
         resetRequestStatuses: state => {
             if (state.getOneRequestMetadata.status === 'expiredAuth') {
                 state.getOneRequestMetadata.status = 'idle';
@@ -260,5 +261,5 @@ export const productsSlice = createSlice({
     }
 });
 
-export const { resetRequestStatuses, removeRatingFromProduct, addRatingToProduct } = productsSlice.actions;
+export const { reset, resetRequestStatuses, removeRatingFromProduct, addRatingToProduct } = productsSlice.actions;
 export default productsSlice.reducer;

@@ -159,36 +159,38 @@ export const leaveCommunity = createAsyncThunk('communities/leave', async (commu
     }
 })
 
+const initialState = {
+    focusedCommunity: null,
+    getOneRequestMetadata: {
+        status: 'idle'
+    },
+    all: [],
+    allCommunitiesRequestMetadata: {
+        next: '/communities?page=1',
+        status: 'idle'
+    },
+    enrolled: [],
+    enrolledCommunitiesRequestMetadata: {
+        next: '/communities?isMember=true&page=1',
+        status: 'idle'
+    },
+    searchResults: [],
+    searchRequestMetadata: {
+        status: 'idle'
+    },
+    joinRequestMetadata: {
+        status: 'idle'
+    },
+    leaveRequestMetadata: {
+        status: 'idle'
+    },
+    errors: []
+}
 export const communitiesSlice = createSlice({
     name: 'communities',
-    initialState: {
-        focusedCommunity: null,
-        getOneRequestMetadata: {
-            status: 'idle'
-        },
-        all: [],
-        allCommunitiesRequestMetadata: {
-            next: '/communities?page=1',
-            status: 'idle'
-        },
-        enrolled: [],
-        enrolledCommunitiesRequestMetadata: {
-            next: '/communities?isMember=true&page=1',
-            status: 'idle'
-        },
-        searchResults: [],
-        searchRequestMetadata: {
-            status: 'idle'
-        },
-        joinRequestMetadata: {
-            status: 'idle'
-        },
-        leaveRequestMetadata: {
-            status: 'idle'
-        },
-        errors: []
-    },
+    initialState: initialState,
     reducers: {
+        reset: () => initialState,
         resetRequestStatuses: state => {
             if (state.getOneRequestMetadata.status === 'expiredAuth') {
                 state.getOneRequestMetadata.status = 'idle';
@@ -349,5 +351,5 @@ export const communitiesSlice = createSlice({
     }
 });
 
-export const { resetRequestStatuses } = communitiesSlice.actions;
+export const { reset, resetRequestStatuses } = communitiesSlice.actions;
 export default communitiesSlice.reducer;

@@ -100,15 +100,17 @@ export const updateRating = createAsyncThunk('ratings/update', async ({ productI
     }
 });
 
+const initialState = {
+    mostRecentRatings: {},
+    // goal with requestMetadata and error maps: only allow one request per product rating
+    requestMetadata: {},
+    errors: {},
+}
 export const ratingsSlice = createSlice({
     name: 'ratings',
-    initialState: {
-        mostRecentRatings: {},
-        // goal with requestMetadata and error maps: only allow one request per product rating
-        requestMetadata: {},
-        errors: {},
-    },
+    initialState: initialState,
     reducers: {
+        reset: () => initialState,
         resetRequestStatuses: state => {
             for (const key in state.requestMetadata) {
                 if (state.requestMetadata[key]?.status === "expiredAuth"){
@@ -251,5 +253,5 @@ export const ratingsSlice = createSlice({
     }
 });
 
-export const { resetRequestStatuses } = ratingsSlice.actions;
+export const { reset, resetRequestStatuses } = ratingsSlice.actions;
 export default ratingsSlice.reducer;

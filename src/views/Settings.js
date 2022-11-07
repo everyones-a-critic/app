@@ -7,14 +7,22 @@ import { findIconDefinition } from '@fortawesome/fontawesome-svg-core'
 import fontAwesomeLibrary from "../../assets/icons/fontAwesomeLibrary";
 
 import { signOut } from "../features/account/accountSlice";
-import Header from '../components/Header';
+import { reset as resetCommunities } from "../features/communities/communitiesSlice";
+import { reset as resetProducts } from "../features/products/productsSlice";
+import { reset as resetRatings } from "../features/ratings/ratingsSlice";
+
+import SettingsPage from '../components/SettingsPage';
 import SettingsRow from '../components/SettingsRow';
+
 import { YELLOW, SUPER_LIGHT_GRAY, LIGHT_GRAY } from '../settings/colors';
 
 const Settings = props => {
     const logout = async () => {
         await props.signOut();
-        props.navigation.navigate('Sign In', params={ customMessage: "You've been successfully logged out."})
+        props.resetCommunities();
+        props.resetProducts();
+        props.resetRatings();
+        props.navigation.navigate('Sign In', { customMessage: "You've been successfully logged out."})
     }
 
     const deleteAccount = () => {
@@ -22,41 +30,23 @@ const Settings = props => {
     }
 
     return (
-        <View style={{ flex: 1 }}>
-            <Header
-                primaryColor={ YELLOW }
-                secondaryColor={ 'black' }
-                backButtonEnabled={ true }
-                navigation={ props.navigation }
-                title={ 'Settings' } />
-            <View style={ styles.contentContainer }>
-                <Text style={ styles.sectionHeader }>Account</Text>
-                <SettingsRow
-                    title={ 'Logout' }
-                    icon={ 'right-from-bracket' }
-                    onPress={ () => logout() }
-                />
-                <SettingsRow
-                    title={ 'Delete Account' }
-                    icon={ 'user-slash' }
-                    onPress={ () => deleteAccount() }
-                />
-            </View>
-        </View>
+        <SettingsPage authExpired={ props.authExpired } navigation={ props.navigation }>
+            <Text style={ styles.sectionHeader }>Account</Text>
+            <SettingsRow
+                title={ 'Logout' }
+                icon={ 'right-from-bracket' }
+                onPress={ () => logout() }
+            />
+            <SettingsRow
+                title={ 'Delete Account' }
+                icon={ 'user-slash' }
+                onPress={ () => deleteAccount() }
+            />
+        </SettingsPage>
     );
 }
 
 const styles = StyleSheet.create({
-    contentContainer: {
-        flex: 1,
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
-        paddingLeft: 15,
-        paddingRight: 15,
-        paddingTop: 15,
-        paddingBottom: 15,
-        backgroundColor: SUPER_LIGHT_GRAY,
-    },
     sectionHeader: {
         marginBottom: 10,
         fontWeight: '500',
@@ -66,7 +56,9 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-    return {}
+    return {
+        authExpired: state.account.loggedIn === false
+    }
 }
 
-export default connect(mapStateToProps, { signOut })(Settings);
+export default connect(mapStateToProps, { signOut, resetCommunities, resetProducts, resetRatings })(Settings);
