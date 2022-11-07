@@ -4,7 +4,8 @@ import {
     SignUpCommand,
     ConfirmSignUpCommand,
     InitiateAuthCommand,
-    ResendConfirmationCodeCommand
+    ResendConfirmationCodeCommand,
+    DeleteUserCommand
 } from "@aws-sdk/client-cognito-identity-provider";
 import { setItemAsync, getItemAsync, deleteItemAsync } from 'expo-secure-store';
 import { Buffer } from 'buffer/';
@@ -123,6 +124,7 @@ export const signIn = createAsyncThunk('account/signIn', async formData => {
 
     await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
     await setItemAsync("RefreshToken", response.AuthenticationResult.RefreshToken);
+    await setItemAsync("AccessToken", response.AuthenticationResult.AccessToken);
 
     return {
         email: formData.email,
@@ -164,9 +166,10 @@ export const sendConfirmationCode = createAsyncThunk('account/sendConfirmationCo
 });
 
 export const signOut = createAsyncThunk('account/signOut', async () => {
-    console.log("signOut")
     await deleteItemAsync("IdentityToken");
     await deleteItemAsync("RefreshToken");
+    await deleteItemAsync("AccessToken");
+    await deleteItemAsync("MostRecentCommunityId");
 
     return {
         loggedIn: false,
@@ -190,25 +193,55 @@ export const refreshSession = createAsyncThunk('account/refreshSession', async (
     const response = await client.send(command);
 
     await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
+    await setItemAsync("AccessToken", response.AuthenticationResult.AccessToken);
 
     return {
         loggedIn: true
     };
 });
 
+export const deleteUser = createAsyncThunk('account/delete', async () => {
+    const accessToken = await getItemAsync("AccessToken");
 
+    const input = {
+        AccessToken: accessToken
+    };
+
+    const client = new CognitoIdentityProviderClient({
+        region: process.env.COGNITO_REGION,
+    });
+    const command = new DeleteUserCommand(input);
+    const response = await client.send(command);
+
+    await deleteItemAsync("IdentityToken");
+    await deleteItemAsync("RefreshToken");
+    await deleteItemAsync("AccessToken");
+    await deleteItemAsync("MostRecentCommunityId");
+
+    return {};
+});
+
+const initialState = {
+    email: null,
+    confirmed: false,
+    requestStatus: {
+        signUp: 'idle',
+        confirm: 'idle',
+        signIn: 'idle',
+        deleteUser: 'idle',
+        refreshSession: 'idle',
+        signOut: 'idle',
+        sendConfirmationCode: 'idle',
+    },
+    loggedIn: null,
+    errors: {
+        fields: {},
+        form: []
+    },
+}
 export const accountSlice = createSlice({
     name: 'account',
-    initialState: {
-        email: null,
-        confirmed: false,
-        requestStatus: 'idle',
-        loggedIn: null,
-        errors: {
-            fields: {},
-            form: []
-        },
-    },
+    initialState: initialState,
     reducers: {
         resetErrors: state => {
             state.errors = {
@@ -239,19 +272,19 @@ export const accountSlice = createSlice({
         // omit posts loading reducers
         builder
             .addCase(signUp.pending, (state, action) => {
-                state.requestStatus = 'loading';
+                state.requestStatus['signUp'] = 'loading';
                 state.errors = {
                     fields: {},
                     form: []
                 }
             })
             .addCase(signUp.fulfilled, (state, action) => {
-                state.requestStatus = 'succeeded';
+                state.requestStatus['signUp'] = 'succeeded';
                 state.email = action.payload.email;
                 state.confirmed = action.payload.confirmed;
             })
             .addCase(signUp.rejected, (state, action) => {
-                state.requestStatus = 'failed';
+                state.requestStatus['signUp'] = 'failed';
                 switch (action.error.name) {
                     case 'InvalidPasswordException':
                         state.errors.fields.password = [
@@ -287,18 +320,19 @@ export const accountSlice = createSlice({
                 }
             })
             .addCase(confirm.pending, (state, action) => {
-                state.requestStatus = 'loading';
+                state.requestStatus['confirm'] = 'loading';
                 state.errors = {
                     fields: {},
                     form: []
                 }
             })
             .addCase(confirm.fulfilled, (state, action) => {
-                state.requestStatus = 'succeeded';
+                state.requestStatus['confirm'] = 'succeeded';
                 state.email = action.payload.email;
             })
             .addCase(confirm.rejected, (state, action) => {
-                state.requestStatus = 'failed';
+                console.log('confirm.rejected')
+                state.requestStatus['confirm'] = 'failed';
                 switch (action.error.name) {
                     case 'ExpiredCodeException':
                         state.errors.fields.confirmationCode = [
@@ -314,20 +348,21 @@ export const accountSlice = createSlice({
                 }
             })
             .addCase(signIn.pending, (state, action) => {
-                state.requestStatus = 'loading';
+                state.requestStatus['signIn'] = 'loading';
                 state.errors = {
                     fields: {},
                     form: []
                 }
             })
             .addCase(signIn.fulfilled, (state, action) => {
-                state.requestStatus = 'succeeded';
+                state.requestStatus['signIn'] = 'succeeded';
                 state.confirmed = true;
                 state.email = action.payload.email;
                 state.loggedIn = action.payload.loggedIn;
             })
             .addCase(signIn.rejected, (state, action) => {
-                state.requestStatus = 'failed';
+                console.log('signIn.rejected')
+                state.requestStatus['signIn'] = 'failed';
                 switch (action.error.name) {
                     case 'NotAuthorizedException':
                         state.errors.form = [
@@ -335,7 +370,7 @@ export const accountSlice = createSlice({
                         ];
                         break;
                     case 'UserNotConfirmedException':
-                        state.requestStatus = 'succeeded';
+                        state.requestStatus['signIn'] = 'succeeded';
                         state.email = action.meta.arg.email;
                         state.confirmed = false;
                         break;
@@ -346,30 +381,51 @@ export const accountSlice = createSlice({
                 }
             })
             .addCase(signOut.pending, (state, action) => {
-                state.requestStatus = 'loading';
+                state.requestStatus['signOut'] = 'loading';
             })
             .addCase(signOut.fulfilled, (state, action) => {
-                state.requestStatus = 'succeeded';
+                state.requestStatus['signOut'] = 'succeeded';
                 state.loggedIn = action.payload.loggedIn;
             })
             .addCase(refreshSession.pending, (state, action) => {
-                state.requestStatus = 'loading';
+                state.requestStatus['signOut'] = 'loading';
                 state.errors = {
                     fields: {},
                     form: []
                 }
             })
             .addCase(refreshSession.fulfilled, (state, action) => {
-                state.requestStatus = 'succeeded';
+                state.requestStatus['refreshSession'] = 'succeeded';
                 state.loggedIn = action.payload.loggedIn;
             })
             .addCase(refreshSession.rejected, (state, action) => {
-                state.requestStatus = 'failed';
+                console.log('refreshSession.rejected')
+                state.requestStatus['refreshSession'] = 'failed';
                 state.loggedIn = false;
                 switch (action.error.name) {
                     case 'NotAuthorizedException':
-                        state.requestStatus = 'succeeded';
+                        state.requestStatus['refreshSession'] = 'succeeded';
                         break;
+                    default:
+                        state.errors.form = [
+                            action.error.message
+                        ];
+                }
+            })
+            .addCase(deleteUser.pending, (state, action) => {
+                state.requestStatus['deleteUser'] = 'loading';
+                state.errors = {
+                    fields: {},
+                    form: []
+                }
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                Object.assign(state, initialState, {loggedIn: false});
+            })
+            .addCase(deleteUser.rejected, (state, action) => {
+                console.log('deleteUser.rejected')
+                state.requestStatus['deleteUser'] = 'failed';
+                switch (action.error.name) {
                     default:
                         state.errors.form = [
                             action.error.message

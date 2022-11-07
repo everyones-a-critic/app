@@ -106,7 +106,7 @@ class SignUp extends React.Component {
 const mapStateToProps = state => {
     return {
         errors: state.account.errors,
-        requestStatus: state.account.requestStatus
+        requestStatus: state.account.requestStatus['signUp']
     };
 };
 
