@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, Text, Image, View, ScrollView, Dimensions, Keyboard } from "react-native";
 import { connect } from "react-redux";
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -14,6 +15,7 @@ import { LIGHT_GRAY } from "../settings/colors";
 
 const windowHeight = Dimensions.get("window").height;
 const ProductHome = (props) => {
+    const insets = useSafeAreaInsets();
     const [ scrollEnabled, setScrollEnabled ] = useState(true);
     const [ bottomSheetVisible, setBottomSheetVisible ] = useState(false);
     const [ scrollLockPosition, setScrollLockPosition ] = useState(0);
@@ -124,13 +126,14 @@ const ProductHome = (props) => {
         const product = props.product;
         const community = props.community;
         if (product !== null && product !== undefined && community !== null && community !== undefined) {
+            const primarySnapPosition = windowHeight - insets.top - insets.bottom + scrollLockPosition - bottomSheetPosition;
             return (
                 <BottomSheet
                     backgroundStyle={{ backgroundColor: `#${community.primary_color}` }}
                     enablePanDownToClose
                     ref={ bottomSheet }
                     index={ -1 }
-                    snapPoints={[windowHeight - bottomSheetPosition + scrollLockPosition, windowHeight - 15 ]}
+                    snapPoints={[primarySnapPosition, windowHeight - 15 ]}
                     onChange={ posIndex => onBottomSheetReposition(posIndex === -1) }
                     handleIndicatorStyle = {{ backgroundColor: `#${community.secondary_color}` }}
                 >
