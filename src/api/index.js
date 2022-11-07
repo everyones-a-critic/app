@@ -73,8 +73,9 @@ api.interceptors.response.use(response => response, async error => {
         }
 
         await setItemAsync("IdentityToken", response.AuthenticationResult.IdToken);
+        await setItemAsync("AccessToken", response.AuthenticationResult.AccessToken);
 
-        if (error.config.headers.retries === 0) {
+        if (error.config.headers.retries === "0") {
             error.config.headers.retries = 1;
             delete error.config.headers.Authorization;
             return await api.request(error.config);
@@ -83,15 +84,11 @@ api.interceptors.response.use(response => response, async error => {
         }
     } else if (error.response?.status === 500) {
         // retry 500 errors as there seems to be intermittent 500 errors from lambda
-        console.log("Received a 500 error:")
-        console.log(error.config)
-        if (error.config.headers.retries === 0) {
-            console.log("hitting retry")
+        if (error.config.headers.retries === "0") {
             error.config.headers.retries = 1;
             await sleep(1000);
             return await api.request(error.config);
         } else {
-            console.log("retried once. returning")
             throw error;
         }
     } else {
