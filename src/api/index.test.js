@@ -35,7 +35,7 @@ test("When a 401 response is received the token is refreshed", async () => {
       config: {
         headers: {
           Authorization: 'SomeWrongToken',
-          retries: 0,
+          retries: "0",
         },
         baseURL: 'https://www.example.com',
         method: 'get',
@@ -71,7 +71,7 @@ test("When two 401 responses in a row are received, the 401 is returned", async 
       config: {
         headers: {
           Authorization: 'SomeWrongToken',
-          retries: 0,
+          retries: "0",
         },
         baseURL: 'https://www.example.com',
         method: 'get',
