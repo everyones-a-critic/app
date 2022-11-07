@@ -60,7 +60,7 @@ const ProductHome = (props) => {
 
     const handleRatingBoxLayoutChange = event => {
         const layout = event.nativeEvent.layout;
-        setBottomSheetPosition(layout.y)
+        setBottomSheetPosition(layout.y + layout.height + 10)
     }
 
     const renderProductInfo = () => {
