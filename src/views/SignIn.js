@@ -45,7 +45,7 @@ class SignIn extends React.Component {
     componentDidUpdate = (prevProps, prevState, snapshot) => {
         if(prevProps.requestStatus === 'loading' && this.props.requestStatus === 'succeeded'){
             if (!this.props.confirmed) {
-                this.props.sendConfirmationCode();
+                this.props.sendConfirmationCode({ email: this.state.email });
                 this.props.navigation.navigate('Confirm Account', { email: this.state.email });
             } else if (this.props.loggedIn) {
                 const next = this.props.route.params?.next || 'Community Enrollment';
