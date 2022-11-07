@@ -1,4 +1,5 @@
 import React from 'react';
+import * as Sentry from 'sentry-expo';
 import { Text, View, StyleSheet, TextInput, Dimensions, Modal, StatusBar, FlatList } from 'react-native';
 import { SafeAreaProvider, SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { connect } from "react-redux";

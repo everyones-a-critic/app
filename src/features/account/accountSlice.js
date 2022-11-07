@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import * as Sentry from 'sentry-expo';
 import {
     CognitoIdentityProviderClient,
     SignUpCommand,
@@ -314,6 +315,7 @@ export const accountSlice = createSlice({
                         }
                         break;
                     default:
+                        Sentry.Native.captureException(action);
                         state.errors.form = [
                             action.error.message
                         ];
@@ -331,7 +333,6 @@ export const accountSlice = createSlice({
                 state.email = action.payload.email;
             })
             .addCase(confirm.rejected, (state, action) => {
-                console.log('confirm.rejected')
                 state.requestStatus['confirm'] = 'failed';
                 switch (action.error.name) {
                     case 'ExpiredCodeException':
@@ -342,6 +343,7 @@ export const accountSlice = createSlice({
                         // TODO - Give the user an easier way to regenerate code
                         break;
                     default:
+                        Sentry.Native.captureException(action);
                         state.errors.form = [
                             action.error.message
                         ];
@@ -361,7 +363,6 @@ export const accountSlice = createSlice({
                 state.loggedIn = action.payload.loggedIn;
             })
             .addCase(signIn.rejected, (state, action) => {
-                console.log('signIn.rejected')
                 state.requestStatus['signIn'] = 'failed';
                 switch (action.error.name) {
                     case 'NotAuthorizedException':
@@ -375,6 +376,7 @@ export const accountSlice = createSlice({
                         state.confirmed = false;
                         break;
                     default:
+                        Sentry.Native.captureException(action);
                         state.errors.form = [
                             action.error.message
                         ];
@@ -399,7 +401,6 @@ export const accountSlice = createSlice({
                 state.loggedIn = action.payload.loggedIn;
             })
             .addCase(refreshSession.rejected, (state, action) => {
-                console.log('refreshSession.rejected')
                 state.requestStatus['refreshSession'] = 'failed';
                 state.loggedIn = false;
                 switch (action.error.name) {
@@ -407,6 +408,8 @@ export const accountSlice = createSlice({
                         state.requestStatus['refreshSession'] = 'succeeded';
                         break;
                     default:
+                        console.log('refreshSession.rejected')
+                        Sentry.Native.captureException(action);
                         state.errors.form = [
                             action.error.message
                         ];
@@ -427,6 +430,7 @@ export const accountSlice = createSlice({
                 state.requestStatus['deleteUser'] = 'failed';
                 switch (action.error.name) {
                     default:
+                        Sentry.Native.captureException(action);
                         state.errors.form = [
                             action.error.message
                         ];

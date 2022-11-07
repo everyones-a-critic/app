@@ -14,3 +14,8 @@ jest.mock('@gorhom/bottom-sheet', () => {
     };
 });
 jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
+jest.mock("sentry-expo", () => ({
+    Native: {
+        captureException: () => jest.fn()
+    },
+}));

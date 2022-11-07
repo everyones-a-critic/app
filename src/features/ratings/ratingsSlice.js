@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import * as Sentry from 'sentry-expo';
 
 import api from "../../api";
 
@@ -138,7 +139,6 @@ export const ratingsSlice = createSlice({
                 state.errors[productId] = [];
             })
             .addCase(getMostRecentRating.rejected, (state, action) => {
-                console.log('getMostRecentRating.rejected: ')
                 const productId = action.meta.arg.productId;
                 let status = 'failed';
                 let errors = [];
@@ -147,9 +147,10 @@ export const ratingsSlice = createSlice({
                         status = 'expiredAuth';
                         break;
                     default:
+                        console.log("getMostRecentRating.rejected")
+                        Sentry.Native.captureException(action);
                         errors = [action.payload?.message || action.error.message]
                 }
-                console.log(errors);
                 state.requestMetadata[productId].status = status;
                 state.errors[productId] = errors;
             })
@@ -170,7 +171,6 @@ export const ratingsSlice = createSlice({
                 state.errors[productId] = [];
             })
             .addCase(createOrUpdateRating.rejected, (state, action) => {
-                console.log('createOrUpdateRating.rejected: ')
                 const productId = action.meta.arg.productId;
                 let status = 'failed';
                 let errors = [];
@@ -179,9 +179,10 @@ export const ratingsSlice = createSlice({
                         status = 'expiredAuth';
                         break;
                     default:
+                        console.log("createOrUpdateRating.rejected")
+                        Sentry.Native.captureException(action);
                         errors = [action.payload?.message || action.error.message]
                 }
-                console.log(errors);
                 state.requestMetadata[productId].status = status;
                 state.errors[productId] = errors;
             })
@@ -203,7 +204,6 @@ export const ratingsSlice = createSlice({
                 state.errors[productId] = [];
             })
             .addCase(archiveRating.rejected, (state, action) => {
-                console.log('archiveRating.rejected: ')
                 const productId = action.meta.arg.productId;
                 let status = 'failed';
                 let errors = [];
@@ -212,9 +212,10 @@ export const ratingsSlice = createSlice({
                         status = 'expiredAuth';
                         break;
                     default:
+                        console.log("archiveRating.rejected")
+                        Sentry.Native.captureException(action);
                         errors = [action.payload?.message || action.error.message]
                 }
-                console.log(errors);
                 state.requestMetadata[productId].status = status;
                 state.errors[productId] = errors;
             })
@@ -235,7 +236,6 @@ export const ratingsSlice = createSlice({
                 state.errors[productId] = [];
             })
             .addCase(updateRating.rejected, (state, action) => {
-                console.log('updateRating.rejected: ')
                 const productId = action.meta.arg.productId;
                 let status = 'failed';
                 let errors = [];
@@ -244,9 +244,10 @@ export const ratingsSlice = createSlice({
                         status = 'expiredAuth';
                         break;
                     default:
+                        console.log("updateRating.rejected")
+                        Sentry.Native.captureException(action);
                         errors = [action.payload?.message || action.error.message]
                 }
-                console.log(errors);
                 state.requestMetadata[productId].status = status;
                 state.errors[productId] = errors;
             });

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import * as Sentry from 'sentry-expo';
 
 import api from "../../api";
 
@@ -233,14 +234,14 @@ export const communitiesSlice = createSlice({
                 });
             })
             .addCase(listMoreCommunities.rejected, (state, action) => {
-                console.log("listMoreCommunities.rejected:")
-                console.log(action.payload?.message || action.error.message)
                 state.allCommunitiesRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
                         state.allCommunitiesRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log("listMoreCommunities.rejected:")
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })
@@ -254,15 +255,17 @@ export const communitiesSlice = createSlice({
                 state.enrolled = state.enrolled.concat(action.payload.communities);
             })
             .addCase(listMoreEnrolledCommunities.rejected, (state, action) => {
-                console.log("listMoreEnrolledCommunities.rejected:")
-                console.log(action.payload?.message || action.error.message)
                 state.enrolledCommunitiesRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
                         state.enrolledCommunitiesRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log("listMoreEnrolledCommunities.rejected:")
+                        Sentry.Native.captureException(action);
+                        console.log("Here")
                         state.errors = [action.payload?.message || action.error.message]
+                        console.log([action.payload?.message || action.error.message])
                 }
             })
             .addCase(joinCommunity.pending, (state, action) => {
@@ -272,8 +275,6 @@ export const communitiesSlice = createSlice({
                 state.enrolled.push(action.payload.community)
             })
             .addCase(joinCommunity.rejected, (state, action) => {
-                console.log("joinCommunity.rejected:")
-                console.log(action.payload?.message || action.error.message)
                 state.joinRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
@@ -283,6 +284,8 @@ export const communitiesSlice = createSlice({
                         state.enrolled.push(action.payload.community)
                         break;
                     default:
+                        console.log("joinCommunity.rejected:")
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })
@@ -293,14 +296,14 @@ export const communitiesSlice = createSlice({
                 state.enrolled = state.enrolled.filter(community => community.id !== action.payload.community.id);
             })
             .addCase(leaveCommunity.rejected, (state, action) => {
-                console.log('leaveCommunity.rejected');
-                console.log(action.payload?.message || action.error.message)
                 state.leaveRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
                         state.leaveRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log('leaveCommunity.rejected');
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })
@@ -313,14 +316,14 @@ export const communitiesSlice = createSlice({
                 state.searchResults = action.payload.communities;
             })
             .addCase(searchCommunities.rejected, (state, action) => {
-                console.log('searchCommunities.rejected')
-                console.log(action.payload?.message || action.error.message)
                 state.searchRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
                         state.searchRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log('searchCommunities.rejected')
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })
@@ -337,14 +340,14 @@ export const communitiesSlice = createSlice({
                 state.errors = [];
             })
             .addCase(getCommunity.rejected, (state, action) => {
-                console.log("getCommunity.rejected:")
-                console.log(action.payload?.message || action.error.message)
                 state.getOneRequestMetadata.status = 'failed';
                 switch(action.payload?.status) {
                     case 401:
                         state.getOneRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log('getCommunity.rejected')
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })

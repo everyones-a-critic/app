@@ -28,7 +28,6 @@ class AccountManagementPage extends React.Component {
     };
 
     onChange = ({ window, screen }) => {
-        console.log("onChange called")
         this.setState({ dimensions: { window, screen } });
     };
 

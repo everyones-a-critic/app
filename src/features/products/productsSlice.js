@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import * as Sentry from 'sentry-expo';
 
 import api from "../../api";
 
@@ -187,13 +188,11 @@ export const productsSlice = createSlice({
                 requestMetadata.status = 'failed'
                 switch(action.payload?.status) {
                     case 401:
-                        console.log("expiredAuth")
                         requestMetadata.status = 'expiredAuth'
                         break;
                     default:
-                        console.log("error")
-                        console.log(action.payload)
-                        console.log(action.error)
+                        console.log("listMoreProducts.rejected")
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
                 state.allByCommunityRequestMetadata[communityId] = requestMetadata;
@@ -217,6 +216,8 @@ export const productsSlice = createSlice({
                         state.getOneRequestMetadata.status = 'expiredAuth';
                         break;
                     default:
+                        console.log("getProduct.rejected")
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
             })
@@ -247,13 +248,11 @@ export const productsSlice = createSlice({
                 requestMetadata.status = 'failed'
                 switch(action.payload?.status) {
                     case 401:
-                        console.log("expiredAuth")
                         requestMetadata.status = 'expiredAuth'
                         break;
                     default:
-                        console.log("error")
-                        console.log(action.payload)
-                        console.log(action.error)
+                        console.log("listMoreProductsWithRatings.rejected")
+                        Sentry.Native.captureException(action);
                         state.errors = [action.payload?.message || action.error.message]
                 }
                 state.allWithRatingsByCommunity[communityId] = requestMetadata;
